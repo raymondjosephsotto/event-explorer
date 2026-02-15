@@ -1,19 +1,12 @@
-import { useState } from "react";
 import { TextField } from "@mui/material";
 
-const Filters = () => {
-  //create a state (city)
-  const [city, setCity] = useState<string>(""); //TS: generic type annotation
+type FiltersProps = {
+  city: string;
+  handleCityChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
-  // Handle changes to the city input field, ensuring type safety for the event parameter
+const Filters = ({city, handleCityChange}: FiltersProps) => {
 
-  const handleCityChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newCityValue = event.target.value;
-    console.log(newCityValue);
-    setCity(newCityValue);
-  };
 
   return (
     <TextField
