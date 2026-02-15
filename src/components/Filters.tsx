@@ -6,16 +6,21 @@ const Filters = () => {
   const [city, setCity] = useState<string>(""); //TS: generic type annotation
 
   // Handle changes to the city input field, ensuring type safety for the event parameter
-  const handleCityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCity(event.target.value);
-  }
+
+  const handleCityChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newCityValue = event.target.value;
+    console.log(newCityValue);
+    setCity(newCityValue);
+  };
 
   return (
     <TextField
       required
       id="outlined-required"
       label="City"
-      defaultValue="Enter your CIty"
+      placeholder="Enter your city"
       // TS: Binds the input value to the city state, making this a controlled component
       value={city}
       // TS: Updates city state when the input value changes
