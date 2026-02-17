@@ -5,29 +5,38 @@ import Filters from "../components/Filters";
 import type { Event } from "../types/event.types";
 
 const EventExplorerContainer = () => {
-    //create a state (city)
-    const [city, setCity] = useState<string>(""); //TS: generic type annotation
+    // State: stores the currently selected city from the input
+    const [city, setCity] = useState<string>("");
 
-    //create a state(events)
+    // State: stores the fetched events from the API
     const [events, setEvents] = useState<Event[]>([]);
 
-    // Handle changes to the city input field, ensuring type safety for the event parameter
+    // Handles changes to the city input field
     const handleCityChange = (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         const newCityValue = event.target.value;
-        console.log(newCityValue);
         setCity(newCityValue);
     };
 
-    //Add a temporary useEffect with empty dependency array
+    // Effect: fetch events whenever the city value changes
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchEventsByCity(city);
+
+            // Update events state with fetched data
             setEvents(data);
-        }
+
+            console.log("Fetching for city:", city);
+        };
+
+        // Guard clause: prevent API call if city is empty or whitespace
+        if (!city.trim()) return;
+
+        // Trigger async fetch
         fetchData();
-    },[]);
+
+    }, [city]); // Re-run effect whenever `city` state changes
 
     return (
         <>
@@ -35,7 +44,7 @@ const EventExplorerContainer = () => {
             <br />
             <Filters city={city} handleCityChange={handleCityChange} />
             <br />
-            <EventList events={events}/>
+            <EventList events={events} />
         </>
     );
 };
