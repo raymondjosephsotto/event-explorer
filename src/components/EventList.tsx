@@ -1,8 +1,8 @@
 import type { Event } from "../types/event.types";
 
 type EventListProps = {
-  events: Event[]
-}
+  events: Event[];
+};
 
 const EventList = ({ events }: EventListProps) => {
   return (
