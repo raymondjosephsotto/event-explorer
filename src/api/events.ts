@@ -22,24 +22,28 @@ type TicketmasterEvent = {
 };
 
 export const fetchEventsByCity = async (city: string): Promise<Event[]> => {
-    const response = await fetch(
-        `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${city}`
-    );
+  const response = await fetch(
+    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${city}`
+  );
 
-    const rawData = await response.json();
+  const rawData: {
+    _embedded?: {
+      events?: TicketmasterEvent[];
+    };
+  } = await response.json();
 
-    // Extract Ticketmaster events array safely
-    const events: TicketmasterEvent[] = rawData._embedded?.events ?? [];
+  // Extract Ticketmaster events array safely
+  const events: TicketmasterEvent[] = rawData._embedded?.events ?? [];
 
-    console.log("Ticketmaster raw events:", events);
+  console.log("Ticketmaster raw events:", events);
 
-    return events.map((event) => ({
-        id: event.id,
-        title: event.name,
-        city: event._embedded?.venues?.[0]?.city?.name ?? "Unknown",
-        date: event.dates?.start?.localDate ?? "TBD",
-        url: event.url,
-        image: event.images?.[0]?.url ?? "",
-    }));
+  return events.map((event) => ({
+    id: event.id,
+    title: event.name,
+    city: event._embedded?.venues?.[0]?.city?.name ?? "Unknown",
+    date: event.dates?.start?.localDate ?? "TBD",
+    url: event.url,
+    image: event.images?.[0]?.url ?? "",
+  }));
 
 };
