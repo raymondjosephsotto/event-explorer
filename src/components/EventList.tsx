@@ -1,5 +1,5 @@
 import type { Event } from "../types/event.types";
-import { Card, CardActions, CardContent, CardMedia, CircularProgress, Grid, Typography, Button } from "@mui/material";
+import { Card, CardActions, CardContent, CardMedia, LinearProgress, Grid, Typography, Button } from "@mui/material";
 
 type EventListProps = {
   events: Event[];
@@ -27,7 +27,7 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
         <>
           <p>Loading events...</p>
           <br />
-          <CircularProgress />
+          <LinearProgress />
         </>
       )}
 
