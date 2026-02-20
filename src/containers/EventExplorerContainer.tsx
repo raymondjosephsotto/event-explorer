@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEvents } from "../hooks/useEvents";
 import EventList from "../components/EventList";
 import Filters from "../components/Filters";
+import { Container } from "@mui/material";
 
 const EventExplorerContainer = () => {
     // State: stores the currently selected city from the input
@@ -19,13 +20,10 @@ const EventExplorerContainer = () => {
     };
 
     return (
-        <>
-            <div>Event Explorer Container</div>
-            <br />
+        <Container>
             <Filters city={city} handleCityChange={handleCityChange} />
-            <br />
             <EventList events={events} isLoading={isLoading} error={error}/>
-        </>
+        </Container>
     );
 };
 

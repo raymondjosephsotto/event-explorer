@@ -18,6 +18,7 @@ const Filters = ({city, handleCityChange}: FiltersProps) => {
       value={city}
       // TS: Updates city state when the input value changes
       onChange={handleCityChange}
+      fullWidth
     />
   );
 };

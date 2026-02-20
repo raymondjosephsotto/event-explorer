@@ -1,5 +1,5 @@
 import type { Event } from "../types/event.types";
-import { CircularProgress } from "@mui/material";
+import { Card, CardActions, CardContent, CardMedia, CircularProgress, Grid, Typography, Button } from "@mui/material";
 
 type EventListProps = {
   events: Event[];
@@ -8,10 +8,19 @@ type EventListProps = {
 };
 
 const EventList = ({ events, isLoading, error }: EventListProps) => {
+  //Helper to convert the date to Month DD, YYYY
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+    }).format(date);
+  };
+
   return (
     <>
-      <div>Event List</div>
-      <br />
 
       {/* Loading State */}
       {isLoading && (
@@ -32,14 +41,34 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
       {/* Data State */}
       {!isLoading && !error && events.length > 0 && (
-        <ul>
+        <Grid container spacing={4}>
           {events.map((event) => (
-            <li key={event.id}>
-              <p>Event Name: {event.title}</p>
-              <p>City: {event.city}</p>
-            </li>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={event.id}>
+              <Card sx={{ maxWidth: 345 }}>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={event.image}
+                  alt={event.title}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {event.title}
+                  </Typography>
+                  <Typography gutterBottom variant="body1">City: {event.city}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {formatDate(event.date)}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button size="small" color="primary" href={event.url} target="_blank" rel="noopener noreferrer">
+                    Learn More
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
           ))}
-        </ul>
+        </Grid>
       )}
     </>
   );
