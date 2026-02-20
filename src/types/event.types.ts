@@ -1,6 +1,8 @@
-//Define a minimal Event type
 export type Event = {
-    id: string;
-    title: string;
-    city: string;
-}
+  id: string;
+  title: string;
+  city: string;
+  date: string;
+  url: string;
+  image: string;
+};
