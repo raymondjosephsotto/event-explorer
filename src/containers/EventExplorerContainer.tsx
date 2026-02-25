@@ -22,9 +22,9 @@ const EventExplorerContainer = () => {
     return (
         <Container>
             <Filters city={city} handleCityChange={handleCityChange} />
-            <EventList events={events} isLoading={isLoading} error={error}/>
+            <EventList events={events} isLoading={isLoading} error={error} />
         </Container>
     );
 };
 
-export default EventExplorerContainer;
+export default EventExplorerContainer

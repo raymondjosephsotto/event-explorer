@@ -1,3 +1,4 @@
+import React from "react";
 import type { Event } from "../types/event.types";
 import { Card, CardActions, CardContent, CardMedia, LinearProgress, Grid, Typography, Button } from "@mui/material";
 
@@ -8,7 +9,7 @@ type EventListProps = {
 };
 
 const EventList = ({ events, isLoading, error }: EventListProps) => {
-  //Helper to convert the date to Month DD, YYYY
+ //Helper to convert the date to Month DD, YYYY
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -74,4 +75,4 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
   );
 };
 
-export default EventList;
+export default React.memo(EventList);
