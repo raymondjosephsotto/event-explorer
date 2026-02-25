@@ -33,7 +33,7 @@ export const useEvents = (city: string) => {
       }
     };
 
-    if (!city.trim()) return;
+    if (city.trim().length < 3) return;
 
     fetchData();
   }, [city]);
