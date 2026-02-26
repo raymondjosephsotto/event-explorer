@@ -1,43 +1,36 @@
-import { useState, useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { fetchEventsByCity } from "../api/events";
-import type { Event } from "../types/event.types";
 
 // Custom Hook: encapsulates event fetching logic
 export const useEvents = (city: string) => {
-  // State: stores the fetched events from the API
-  const [events, setEvents] = useState<Event[]>([]);
+  // useQuery manages server-state lifecycle for us.
+  // It handles fetching, caching, loading state, error state,
+  // background refetching, and deduplication automatically.
+  const {
+    data,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['events', city],
+    // queryKey uniquely identifies this query in TanStack's cache.
+    // If 'city' changes, TanStack treats it as a new query and refetches.
 
-  // State: indicates whether the fetch request is in progress
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+    queryFn: () => fetchEventsByCity(city),
+    // queryFn is the function that actually fetches data from the server.
+    // It must return a Promise. TanStack calls this internally.
 
-  // State: stores any error message from the fetch request
-  const [error, setError] = useState<string | null>(null);
+    enabled: city.trim().length >= 3,
+    // enabled acts like a guard condition.
+    // The query will only run if this evaluates to true.
+  });
 
-  // Effect: runs every time `city` changes
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const data = await fetchEventsByCity(city);
-        setEvents(data);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("Something went wrong while fetching events.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (city.trim().length < 3) return;
-
-    fetchData();
-  }, [city]);
-
-  // Expose state to consuming components
-  return { events, isLoading, error };
+  // We normalize the return shape so the rest of the app
+  // does not need to know it's using TanStack.
+  // 'data' can be undefined before the first fetch,
+  // so we fallback to an empty array for safety.
+  return {
+    events: data ?? [],
+    isLoading,
+    error: error instanceof Error ? error.message : null,
+  };
 };
