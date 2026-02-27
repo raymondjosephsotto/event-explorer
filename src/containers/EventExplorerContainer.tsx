@@ -5,8 +5,13 @@ import Filters from "../components/Filters";
 import { Container } from "@mui/material";
 
 const EventExplorerContainer = () => {
+    // Initialize city state from URL query param (if present)
+    const getInitialCityFromURL = (): string => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("city") ?? "";
+    };
     // State: stores the currently selected city from the input
-    const [city, setCity] = useState<string>("");
+    const [city, setCity] = useState<string>(getInitialCityFromURL());
 
     // debouncedCity updates only after the user stops typing.
     // This prevents triggering API calls on every keystroke.
@@ -25,6 +30,24 @@ const EventExplorerContainer = () => {
             clearTimeout(timer); //clear previous timer if user keeps typing
         };
     }, [city])
+
+    //Effect: sync city state to URL query parameter
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (city.trim()) {
+            params.set("city", city);
+        } else {
+            params.delete("city");
+        }
+
+        const queryString = params.toString();
+        const newURL = queryString
+            ? `${window.location.pathname}?${queryString}`
+            : window.location.pathname;
+
+        window.history.replaceState(null, "", newURL);
+    },[city])
 
     // Handles changes to the city input field
     const handleCityChange = (
