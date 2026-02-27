@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEvents } from "../hooks/useEvents";
 import EventList from "../components/EventList";
 import Filters from "../components/Filters";
@@ -8,8 +8,23 @@ const EventExplorerContainer = () => {
     // State: stores the currently selected city from the input
     const [city, setCity] = useState<string>("");
 
+    // debouncedCity updates only after the user stops typing.
+    // This prevents triggering API calls on every keystroke.
+    const [debouncedCity, setDebouncedCity] = useState<string>(city);
+
     //set the custom hook (useEvents)logic:
-    const { events, isLoading, error } = useEvents(city);
+    const { events, isLoading, error } = useEvents(debouncedCity);
+
+    //Effect: debounce city input before triggering API fetch
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedCity(city);
+        }, 500); //wait 500ms after user stops typing
+
+        return () => {
+            clearTimeout(timer); //clear previous timer if user keeps typing
+        };
+    }, [city])
 
     // Handles changes to the city input field
     const handleCityChange = (
