@@ -15,7 +15,7 @@ export const useEvents = (city: string, sort: string) => {
     // queryKey uniquely identifies this query in TanStack's cache.
     // If 'city' changes, TanStack treats it as a new query and refetches.
 
-    queryFn: () => fetchEventsByCity(city, sort),
+    queryFn: ({signal}) => fetchEventsByCity(city, sort, signal),
     // queryFn is the function that actually fetches data from the server.
     // It must return a Promise. TanStack calls this internally.
 

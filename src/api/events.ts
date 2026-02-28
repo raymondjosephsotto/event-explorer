@@ -21,9 +21,9 @@ type TicketmasterEvent = {
   }[];
 };
 
-export const fetchEventsByCity = async (city: string, sort: string): Promise<Event[]> => {
+export const fetchEventsByCity = async (city: string, sort: string, signal?: AbortSignal): Promise<Event[]> => {
   const response = await fetch(
-    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${city}&sort=${sort}`
+    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${city}&sort=${sort}`, {signal}
   );
 
   const rawData: {
