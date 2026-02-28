@@ -13,12 +13,16 @@ const EventExplorerContainer = () => {
     // State: stores the currently selected city from the input
     const [city, setCity] = useState<string>(getInitialCityFromURL());
 
+    // State: controls selected sorting option for events
+    // Default is date ascending
+    const [sort, setSort] = useState<string>("date,asc");
+
     // debouncedCity updates only after the user stops typing.
     // This prevents triggering API calls on every keystroke.
     const [debouncedCity, setDebouncedCity] = useState<string>(city);
 
     //set the custom hook (useEvents)logic:
-    const { events, isLoading, error } = useEvents(debouncedCity);
+    const { events, isLoading, error } = useEvents(debouncedCity, sort);
 
     //Effect: debounce city input before triggering API fetch
     useEffect(() => {
@@ -47,7 +51,7 @@ const EventExplorerContainer = () => {
             : window.location.pathname;
 
         window.history.replaceState(null, "", newURL);
-    },[city])
+    }, [city])
 
     // Handles changes to the city input field
     const handleCityChange = (
@@ -60,6 +64,14 @@ const EventExplorerContainer = () => {
     return (
         <Container>
             <Filters city={city} handleCityChange={handleCityChange} />
+            <select
+                value={sort}
+                onChange={(event) => setSort(event.target.value)}
+            >
+                <option value="date,asc">Date Ascending</option>
+                <option value="date,desc">Date Descending</option>
+                <option value="name,asc">Name Ascending</option>
+            </select>
             <EventList events={events} isLoading={isLoading} error={error} />
         </Container>
     );
