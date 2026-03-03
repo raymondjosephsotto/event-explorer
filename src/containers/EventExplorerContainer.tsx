@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useEvents } from "../hooks/useEvents";
 import EventList from "../components/EventList";
 import Filters from "../components/Filters";
+import Hero from "../components/Hero";
+import TrendingMasonry from "../components/TrendingMasonry";
 import { Container, Box, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { StickyNav, SearchContainer, SortContainer } from "./EventExplorer.styles";
+import { StickyNav, SearchContainer, SortContainer, PageContentWrapper } from "./EventExplorer.styles";
 
 const EventExplorerContainer = () => {
     // Initialize query state from URL query param (if present)
@@ -128,15 +130,26 @@ const EventExplorerContainer = () => {
                 </Container>
             </StickyNav>
 
+            {!query && !isLoading && events.length > 0 && (
+                <Hero events={events} />
+            )}
+            {!query && !isLoading && events.length > 0 && (
+                <PageContentWrapper py={6}>
+                    <TrendingMasonry events={events.slice(0, 12)} />
+                </PageContentWrapper>
+            )}
+
             {/* Events Section */}
-            <Container sx={{ py: 4 }}>
-                <EventList
-                    events={events}
-                    isLoading={isLoading}
-                    error={error}
-                    onClearSearch={handleClearSearch}
-                />
-            </Container>
+            {(query.trim().length > 0 || isLoading || error) && (
+                <Container sx={{ py: 4 }}>
+                    <EventList
+                        events={events}
+                        isLoading={isLoading}
+                        error={error}
+                        onClearSearch={handleClearSearch}
+                    />
+                </Container>
+            )}
         </Box>
     );
 };

@@ -45,3 +45,16 @@ export const SortContainer = styled(Box, {
     opacity: hasQuery ? 1 : 0,
   },
 }));
+
+// Shared centered content wrapper (used for Hero inner content, Trending, Events)
+export const PageContentWrapper = styled(Box)(({ theme }) => ({
+  maxWidth: 1400,
+  margin: "0 auto",
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+
+  [theme.breakpoints.up("md")]: {
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4),
+  },
+}));
