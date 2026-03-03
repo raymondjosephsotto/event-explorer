@@ -3,6 +3,7 @@ import { useEvents } from "../hooks/useEvents";
 import EventList from "../components/EventList";
 import Filters from "../components/Filters";
 import { Container, Box, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { StickyNav, SearchContainer, SortContainer } from "./EventExplorer.styles";
 
 const EventExplorerContainer = () => {
     // Initialize query state from URL query param (if present)
@@ -64,17 +65,7 @@ const EventExplorerContainer = () => {
     return (
         <Box>
             {/* Sticky Navigation Bar */}
-            <Box
-                sx={{
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 1100,
-                    backgroundColor: "background.paper",
-                    borderBottom: "1px solid",
-                    borderColor: "divider",
-                    py: 2,
-                }}
-            >
+            <StickyNav>
                 <Container>
                     <Stack
                         direction={{ xs: "column", md: "row" }}
@@ -83,52 +74,14 @@ const EventExplorerContainer = () => {
                         justifyContent="space-between"
                         sx={{}}
                     >
-                        <Box
-                            sx={{
-                                flexGrow: 1,
-                                flexBasis: {
-                                    md: query.trim().length > 0 ? "calc(100% - 260px)" : "100%",
-                                },
-                                maxWidth: {
-                                    md: query.trim().length > 0 ? "calc(100% - 260px)" : "100%",
-                                },
-                                transition: "flex-basis 360ms cubic-bezier(0.4, 0, 0.2, 1), max-width 360ms cubic-bezier(0.4, 0, 0.2, 1)",
-                            }}
-                        >
+                        <SearchContainer hasQuery={query.trim().length > 0}>
                             <Filters
                                 query={query}
                                 handleQueryChange={handleQueryChange}
                             />
-                        </Box>
+                        </SearchContainer>
 
-                        <Box
-                            sx={{
-                                display: "block",
-
-                                // Mobile accordion animation
-                                overflow: {
-                                    xs: query.trim().length > 0 ? "visible" : "hidden",
-                                    md: "visible",
-                                },
-                                maxHeight: {
-                                    xs: query.trim().length > 0 ? 120 : 0,
-                                },
-
-                                // Desktop horizontal animation
-                                flexBasis: {
-                                    md: query.trim().length > 0 ? 260 : 0,
-                                },
-                                maxWidth: {
-                                    md: query.trim().length > 0 ? 260 : 0,
-                                },
-                                opacity: {
-                                    md: query.trim().length > 0 ? 1 : 0,
-                                },
-
-                                transition: "max-height 300ms ease, flex-basis 360ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease",
-                                flexShrink: 0,
-                            }}
-                        >
+                        <SortContainer hasQuery={query.trim().length > 0}>
                             <FormControl
                                 fullWidth
                                 sx={{
@@ -158,10 +111,10 @@ const EventExplorerContainer = () => {
                                     </MenuItem>
                                 </Select>
                             </FormControl>
-                        </Box>
+                        </SortContainer>
                     </Stack>
                 </Container>
-            </Box>
+            </StickyNav>
 
             {/* Events Section */}
             <Container sx={{ py: 4 }}>
