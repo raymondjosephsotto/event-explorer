@@ -1,6 +1,8 @@
 import React from "react";
 import type { Event } from "../types/event.types";
-import { Card, CardActions, CardContent, CardMedia, Grid, Typography, Button, Backdrop, CircularProgress } from "@mui/material";
+import { CardActions, Typography, Button, Backdrop, CircularProgress } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import { EventsGrid, EventCard, EventImage, EventContent } from "./EventList.styles";
 
 type EventListProps = {
   events: Event[];
@@ -48,46 +50,18 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
       {/* Data State */}
       {!isLoading && !error && events.length > 0 && (
-        <Grid
+        <EventsGrid
           container
           spacing={4}
-          sx={{
-            maxWidth: 1000,
-            mx: "auto",
-          }}
         >
           {events.map((event) => (
-            <Grid size={{ xs: 12 }} key={event.id}>
-              <Card
-                sx={{
-                  display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
-                  alignItems: "stretch",
-                  overflow: "hidden",
-                  borderRadius: 2,
-                  boxShadow: 3,
-                }}
-              >
-                <CardMedia
-                  component="img"
+            <Grid size={12} key={event.id}>
+              <EventCard>
+                <EventImage
                   image={event.image}
-                  alt={event.title}
-                  sx={{
-                    width: { xs: "100%", md: 300 },
-                    height: { xs: 200, md: "auto" },
-                    objectFit: "cover",
-                  }}
                 />
 
-                <CardContent
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    p: 3,
-                  }}
-                >
+                <EventContent>
                   <Typography gutterBottom variant="h5" component="div">
                     {event.title}
                   </Typography>
@@ -117,11 +91,11 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
                       View Event
                     </Button>
                   </CardActions>
-                </CardContent>
-              </Card>
+                </EventContent>
+              </EventCard>
             </Grid>
           ))}
-        </Grid>
+        </EventsGrid>
       )}
     </>
   );

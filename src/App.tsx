@@ -1,4 +1,3 @@
-import './App.css';
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import EventExplorerContainer from './containers/EventExplorerContainer';
 
