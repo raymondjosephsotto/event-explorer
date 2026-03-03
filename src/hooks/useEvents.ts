@@ -10,6 +10,7 @@ export const useEvents = (query: string, sort: string) => {
     data,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['events', query, sort],
     // queryKey uniquely identifies this query in TanStack's cache.
@@ -32,5 +33,6 @@ export const useEvents = (query: string, sort: string) => {
     events: data ?? [],
     isLoading,
     error: error instanceof Error ? error.message : null,
+    refetch
   };
 };
