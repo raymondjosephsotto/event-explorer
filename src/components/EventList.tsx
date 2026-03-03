@@ -1,6 +1,6 @@
 import React from "react";
 import type { Event } from "../types/event.types";
-import { CardActions, Typography, Button, Backdrop, CircularProgress, Stack, Chip } from "@mui/material";
+import { CardActions, Typography, Button, Stack, Chip, Skeleton } from "@mui/material";
 import type { ChipProps } from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
 import { EventsGrid, EventCard, EventImage, EventContent } from "./EventList.styles";
@@ -64,22 +64,33 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
   return (
     <>
-      {/* Loading Overlay */}
-      <Backdrop
-        open={isLoading}
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          color: "#fff",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <CircularProgress color="inherit" />
-        <Typography variant="h6">
-          Loading events...
-        </Typography>
-      </Backdrop>
+      {/* Loading State */}
+      {isLoading && (
+        <EventsGrid container spacing={4}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Grid size={12} key={index}>
+              <EventCard>
+                {/* Mirror real horizontal layout */}
+                <EventImage>
+                  <Skeleton variant="rectangular" width="100%" height="100%" />
+                </EventImage>
 
+                <EventContent>
+                  <Skeleton variant="text" width="60%" height={32} sx={{ mb: 1 }} />
+                  <Skeleton variant="text" width="40%" height={24} sx={{ mb: 1 }} />
+
+                  <Skeleton variant="text" width="50%" height={20} />
+                  <Skeleton variant="text" width="70%" height={20} />
+
+                  <CardActions sx={{ mt: 2, p: 0 }}>
+                    <Skeleton variant="rectangular" width={120} height={36} />
+                  </CardActions>
+                </EventContent>
+              </EventCard>
+            </Grid>
+          ))}
+        </EventsGrid>
+      )}
       {/* Error State */}
       {!isLoading && error && <p>Error: {error}</p>}
 
