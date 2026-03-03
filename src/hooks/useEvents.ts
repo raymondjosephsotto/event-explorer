@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchEventsByCity } from "../api/events";
+import { fetchEventsByQuery } from "../api/events";
 
 // Custom Hook: encapsulates event fetching logic
-export const useEvents = (city: string, sort: string) => {
+export const useEvents = (query: string, sort: string) => {
   // useQuery manages server-state lifecycle for us.
   // It handles fetching, caching, loading state, error state,
   // background refetching, and deduplication automatically.
@@ -11,15 +11,15 @@ export const useEvents = (city: string, sort: string) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['events', city, sort],
+    queryKey: ['events', query, sort],
     // queryKey uniquely identifies this query in TanStack's cache.
-    // If 'city' changes, TanStack treats it as a new query and refetches.
+    // If 'query' changes, TanStack treats it as a new query and refetches.
 
-    queryFn: ({signal}) => fetchEventsByCity(city, sort, signal),
+    queryFn: ({ signal }) => fetchEventsByQuery(query, sort, signal),
     // queryFn is the function that actually fetches data from the server.
     // It must return a Promise. TanStack calls this internally.
 
-    enabled: city.trim().length >= 3,
+    enabled: query.trim().length >= 3,
     // enabled acts like a guard condition.
     // The query will only run if this evaluates to true.
   });

@@ -1,6 +1,6 @@
 import React from "react";
 import type { Event } from "../types/event.types";
-import { Card, CardActions, CardContent, CardMedia, LinearProgress, Grid, Typography, Button } from "@mui/material";
+import { Card, CardActions, CardContent, CardMedia, Grid, Typography, Button, Backdrop, CircularProgress } from "@mui/material";
 
 type EventListProps = {
   events: Event[];
@@ -22,15 +22,21 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
   return (
     <>
-
-      {/* Loading State */}
-      {isLoading && (
-        <>
-          <p>Loading events...</p>
-          <br />
-          <LinearProgress />
-        </>
-      )}
+      {/* Loading Overlay */}
+      <Backdrop
+        open={isLoading}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          color: "#fff",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <CircularProgress color="inherit" />
+        <Typography variant="h6">
+          Loading events...
+        </Typography>
+      </Backdrop>
 
       {/* Error State */}
       {!isLoading && error && <p>Error: {error}</p>}
@@ -42,30 +48,76 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
       {/* Data State */}
       {!isLoading && !error && events.length > 0 && (
-        <Grid container spacing={4}>
+        <Grid
+          container
+          spacing={4}
+          sx={{
+            maxWidth: 1000,
+            mx: "auto",
+          }}
+        >
           {events.map((event) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={event.id}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid size={{ xs: 12 }} key={event.id}>
+              <Card
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  alignItems: "stretch",
+                  overflow: "hidden",
+                  borderRadius: 2,
+                  boxShadow: 3,
+                }}
+              >
                 <CardMedia
                   component="img"
-                  height="140"
                   image={event.image}
                   alt={event.title}
+                  sx={{
+                    width: { xs: "100%", md: 300 },
+                    height: { xs: 200, md: "auto" },
+                    objectFit: "cover",
+                  }}
                 />
-                <CardContent>
+
+                <CardContent
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    p: 3,
+                  }}
+                >
                   <Typography gutterBottom variant="h5" component="div">
                     {event.title}
                   </Typography>
-                  <Typography gutterBottom variant="body1">City: {event.city}</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "text.secondary", mb: 1 }}
+                  >
+                    {event.city}
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "text.secondary" }}
+                  >
                     {formatDate(event.date)}
                   </Typography>
+
+                  <CardActions sx={{ mt: 2, p: 0 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      href={event.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Event
+                    </Button>
+                  </CardActions>
                 </CardContent>
-                <CardActions>
-                  <Button size="small" color="primary" href={event.url} target="_blank" rel="noopener noreferrer">
-                    Learn More
-                  </Button>
-                </CardActions>
               </Card>
             </Grid>
           ))}
