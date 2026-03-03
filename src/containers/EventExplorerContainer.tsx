@@ -11,6 +11,18 @@ const EventExplorerContainer = () => {
         const params = new URLSearchParams(window.location.search);
         return params.get("q") ?? "";
     };
+    //Handles clear search
+    const handleClearSearch = () => {
+        // Clear query state
+        setQuery("");
+
+        // Remove query param from URL
+        const newURL = window.location.pathname;
+        window.history.replaceState(null, "", newURL);
+
+        // Scroll to top for better UX
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
     // State: stores the current search query from the input
     const [query, setQuery] = useState<string>(getInitialQueryFromURL());
 
@@ -122,6 +134,7 @@ const EventExplorerContainer = () => {
                     events={events}
                     isLoading={isLoading}
                     error={error}
+                    onClearSearch={handleClearSearch}
                 />
             </Container>
         </Box>
