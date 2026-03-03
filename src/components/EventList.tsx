@@ -1,16 +1,18 @@
 import React from "react";
-import type { Event } from "../types/event.types";
-import { CardActions, Typography, Button, Stack, Chip, Skeleton } from "@mui/material";
-import type { ChipProps } from "@mui/material/Chip";
-import Grid from "@mui/material/Grid";
-import { EventsGrid, EventCard, EventImage, EventContent } from "./EventList.styles";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EventIcon from "@mui/icons-material/Event";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
+import { Box, Button, CardActions, Chip, Skeleton, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import type { ChipProps } from "@mui/material/Chip";
+import { EventCard, EventContent, EventImage, EventsGrid } from "./EventList.styles";
+import type { Event } from "../types/event.types";
 
 type EventListProps = {
   events: Event[];
   isLoading: boolean;
   error: string | null;
+  onClearSearch: () => void;
 };
 
 const getCategoryColor = (category: string): ChipProps["color"] => {
@@ -35,7 +37,7 @@ const getCategoryColor = (category: string): ChipProps["color"] => {
   return "primary";
 };
 
-const EventList = ({ events, isLoading, error }: EventListProps) => {
+const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) => {
   //Helper to convert the date to Month DD, YYYY
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,10 +53,9 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
   const formatTime = (timeString: string) => {
     if (!timeString) return "";
 
-    const [hour, minute] = timeString.split(":");
-    const date = new Date();
-    date.setHours(Number(hour));
-    date.setMinutes(Number(minute));
+    const date = new Date(timeString);
+
+    if (isNaN(date.getTime())) return "";
 
     return new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
@@ -96,7 +97,41 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
 
       {/* Empty State */}
       {!isLoading && !error && events.length === 0 && (
-        <p>No events found.</p>
+        <Box
+          sx={{
+            minHeight: "50vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            px: 2,
+          }}
+        >
+          <Box>
+            <SearchOffIcon
+              sx={{
+                fontSize: 64,
+                color: "text.secondary",
+                mb: 2,
+              }}
+            />
+
+            <Typography variant="h5" gutterBottom>
+              No events found
+            </Typography>
+
+            <Typography variant="body1" sx={{ color: "text.secondary" }}>
+              Try searching for a different artist, city, or date.
+            </Typography>
+            <Button
+              variant="outlined"
+              sx={{ mt: 3 }}
+              onClick={onClearSearch}
+            >
+              Clear Search
+            </Button>
+          </Box>
+        </Box>
       )}
 
       {/* Data State */}

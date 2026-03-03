@@ -9,10 +9,11 @@ describe('EventList', () => {
                 events={[]}
                 isLoading={false}
                 error={null}
+                onClearSearch={() => {}}
             />
         );
 
-        expect(screen.getByText("No events found.")).toBeInTheDocument();
+        expect(screen.getByText("No events found")).toBeInTheDocument();
     });
 
     it('renders loading state when isLoading is true', () => {
@@ -21,10 +22,12 @@ describe('EventList', () => {
                 events={[]}
                 isLoading={true}
                 error={null}
+                onClearSearch={() => {}}
             />
         );
 
-        expect(screen.getByText("Loading events...")).toBeInTheDocument();
+        const skeletons = document.querySelectorAll(".MuiSkeleton-root");
+        expect(skeletons.length).toBeGreaterThan(0);
     });
 
     it('renders event title when events exist', () => {
@@ -33,9 +36,12 @@ describe('EventList', () => {
                 id: '1',
                 title: 'New York Yankees vs Mets',
                 city: 'New York',
-                date: '2026-02-22',
+                date: '2026-02-22T19:00:00.000Z',
                 url: 'https://example.com',
                 image: 'https://example.com/image.jpg',
+                venue: 'Test Venue',
+                time: '2026-02-22T19:00:00.000Z',
+                categories: ['Sports'],
             },
         ];
 
@@ -44,6 +50,7 @@ describe('EventList', () => {
                 events={mockEvents}
                 isLoading={false}
                 error={null}
+                onClearSearch={() => {}}
             />
         );
 
@@ -57,6 +64,7 @@ describe('EventList', () => {
                 events={[]}
                 isLoading={false}
                 error="Something went wrong"
+                onClearSearch={() => {}}
             />
         );
 
