@@ -19,7 +19,7 @@ export const useEvents = (query: string, sort: string) => {
     // queryFn is the function that actually fetches data from the server.
     // It must return a Promise. TanStack calls this internally.
 
-    enabled: query.trim().length >= 3,
+    enabled: true,
     // enabled acts like a guard condition.
     // The query will only run if this evaluates to true.
   });

@@ -20,6 +20,8 @@ type TicketmasterEvent = {
   };
   images?: {
     url: string;
+    width?: number;
+    height?: number;
   }[];
   classifications?: {
     segment?: { name?: string };
@@ -30,7 +32,7 @@ type TicketmasterEvent = {
 
 export const fetchEventsByQuery = async (query: string, sort: string, signal?: AbortSignal): Promise<Event[]> => {
   const response = await fetch(
-    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${query}&sort=${sort}`, {signal}
+    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${query.trim() || "concert"}&sort=${sort}`, { signal }
   );
 
   const rawData: {
@@ -42,10 +44,8 @@ export const fetchEventsByQuery = async (query: string, sort: string, signal?: A
   // Extract Ticketmaster events array safely
   const events: TicketmasterEvent[] = rawData._embedded?.events ?? [];
 
-  //console.log("Ticketmaster raw events:", events);
-// console.log("Raw Ticketmaster event:", rawData._embedded?.events?.[0]);
-// console.log(events[0]);
-console.log(events[0]?.classifications?.[0]);
+console.log("Fetched events length:", events.length);
+console.log("First event:", events[0]);
 
   return events.map((event) => {
     const venue = event._embedded?.venues?.[0]?.name ?? "Unknown Venue";
@@ -59,6 +59,12 @@ console.log(events[0]?.classifications?.[0]);
         ?.map((c) => c.genre?.name || c.segment?.name)
         .filter((name): name is string => Boolean(name)) ?? [];
 
+    const largestImage =
+      event.images
+        ?.slice()
+        .sort((a, b) => (b.width ?? 0) - (a.width ?? 0))[0]
+        ?.url ?? "/placeholder-hero.jpg";
+
     return {
       id: event.id,
       title: event.name,
@@ -68,7 +74,7 @@ console.log(events[0]?.classifications?.[0]);
       time: localTime,
       categories,
       url: event.url,
-      image: event.images?.[0]?.url ?? "",
+      image: largestImage,
     };
   });
 
