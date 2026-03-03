@@ -7,10 +7,12 @@ type TicketmasterEvent = {
   dates?: {
     start?: {
       localDate?: string;
+      localTime?: string;
     };
   };
   _embedded?: {
     venues?: {
+      name?: string;
       city?: {
         name?: string;
       };
@@ -18,6 +20,11 @@ type TicketmasterEvent = {
   };
   images?: {
     url: string;
+  }[];
+  classifications?: {
+    segment?: { name?: string };
+    genre?: { name?: string };
+    subGenre?: { name?: string };
   }[];
 };
 
@@ -35,15 +42,34 @@ export const fetchEventsByQuery = async (query: string, sort: string, signal?: A
   // Extract Ticketmaster events array safely
   const events: TicketmasterEvent[] = rawData._embedded?.events ?? [];
 
-  console.log("Ticketmaster raw events:", events);
+  //console.log("Ticketmaster raw events:", events);
+// console.log("Raw Ticketmaster event:", rawData._embedded?.events?.[0]);
+// console.log(events[0]);
+console.log(events[0]?.classifications?.[0]);
 
-  return events.map((event) => ({
-    id: event.id,
-    title: event.name,
-    city: event._embedded?.venues?.[0]?.city?.name ?? "Unknown",
-    date: event.dates?.start?.localDate ?? "TBD",
-    url: event.url,
-    image: event.images?.[0]?.url ?? "",
-  }));
+  return events.map((event) => {
+    const venue = event._embedded?.venues?.[0]?.name ?? "Unknown Venue";
+    const city = event._embedded?.venues?.[0]?.city?.name ?? "Unknown";
+
+    const localDate = event.dates?.start?.localDate ?? "TBD";
+    const localTime = event.dates?.start?.localTime ?? "";
+
+    const categories =
+      event.classifications
+        ?.map((c) => c.genre?.name || c.segment?.name)
+        .filter((name): name is string => Boolean(name)) ?? [];
+
+    return {
+      id: event.id,
+      title: event.name,
+      venue,
+      city,
+      date: localDate,
+      time: localTime,
+      categories,
+      url: event.url,
+      image: event.images?.[0]?.url ?? "",
+    };
+  });
 
 };

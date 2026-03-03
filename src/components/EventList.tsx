@@ -1,8 +1,11 @@
 import React from "react";
 import type { Event } from "../types/event.types";
-import { CardActions, Typography, Button, Backdrop, CircularProgress } from "@mui/material";
+import { CardActions, Typography, Button, Backdrop, CircularProgress, Stack, Chip } from "@mui/material";
+import type { ChipProps } from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
 import { EventsGrid, EventCard, EventImage, EventContent } from "./EventList.styles";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import EventIcon from "@mui/icons-material/Event";
 
 type EventListProps = {
   events: Event[];
@@ -10,8 +13,30 @@ type EventListProps = {
   error: string | null;
 };
 
+const getCategoryColor = (category: string): ChipProps["color"] => {
+  const normalized = category.toLowerCase();
+
+  if (normalized.includes("music") || normalized.includes("r&b")) {
+    return "secondary";
+  }
+
+  if (normalized.includes("sport")) {
+    return "success";
+  }
+
+  if (normalized.includes("comedy")) {
+    return "warning";
+  }
+
+  if (normalized.includes("community") || normalized.includes("civic")) {
+    return "info";
+  }
+
+  return "primary";
+};
+
 const EventList = ({ events, isLoading, error }: EventListProps) => {
- //Helper to convert the date to Month DD, YYYY
+  //Helper to convert the date to Month DD, YYYY
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -19,6 +44,21 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
       year: "numeric",
       month: "long",
       day: "2-digit",
+    }).format(date);
+  };
+
+  //Helper to format time
+  const formatTime = (timeString: string) => {
+    if (!timeString) return "";
+
+    const [hour, minute] = timeString.split(":");
+    const date = new Date();
+    date.setHours(Number(hour));
+    date.setMinutes(Number(minute));
+
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -66,19 +106,40 @@ const EventList = ({ events, isLoading, error }: EventListProps) => {
                     {event.title}
                   </Typography>
 
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.secondary", mb: 1 }}
-                  >
-                    {event.city}
-                  </Typography>
+                  {event.categories.length > 0 && (
+                    <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap" }}>
+                      {event.categories.slice(0, 2).map((category) => (
+                        <Chip
+                          key={category}
+                          label={category}
+                          size="small"
+                          color={getCategoryColor(category)}
+                          variant="filled"
+                          sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                  )}
 
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.secondary" }}
-                  >
-                    {formatDate(event.date)}
-                  </Typography>
+                  <Stack spacing={0.5} sx={{ mt: 1 }}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <EventIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                      <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        {formatDate(event.date)}
+                        {event.time && ` • ${formatTime(event.time)}`}
+                      </Typography>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <LocationOnIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                      <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        {event.venue}, {event.city}
+                      </Typography>
+                    </Stack>
+                  </Stack>
 
                   <CardActions sx={{ mt: 2, p: 0 }}>
                     <Button
