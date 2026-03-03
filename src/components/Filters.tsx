@@ -1,23 +1,22 @@
 import { TextField } from "@mui/material";
 
 type FiltersProps = {
-  city: string;
-  handleCityChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  query: string;
+  handleQueryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const Filters = ({city, handleCityChange}: FiltersProps) => {
+const Filters = ({ query, handleQueryChange }: FiltersProps) => {
 
 
   return (
     <TextField
-      required
       id="outlined-required"
-      label="City"
-      placeholder="Enter your city"
-      // TS: Binds the input value to the city state, making this a controlled component
-      value={city}
-      // TS: Updates city state when the input value changes
-      onChange={handleCityChange}
+      label="Search Events"
+      placeholder="Enter city, artist, or event"
+      // TS: Binds the input value to the query state, making this a controlled component
+      value={query}
+      // TS: Updates query state when the input value changes
+      onChange={handleQueryChange}
       fullWidth
     />
   );
