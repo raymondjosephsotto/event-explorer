@@ -10,25 +10,27 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
 
   return (
     <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
-      <Typography variant="h4" fontWeight={700} sx={{ mb: 3 }}>
+      <Typography variant="h4" fontWeight={700} sx={{
+        mb: 3, fontSize: {
+          xs: "1.8rem",
+          sm: "2.2rem",
+          md: "2.8rem",
+          lg: "3.5rem",
+        }
+      }}>
         Trending Events
       </Typography>
 
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(4, 1fr)",
-          },
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: 3,
           gridAutoRows: 160,
           gridAutoFlow: "dense",
         }}
       >
         {events.map((event, index) => {
-          const columnSpan = index % 7 === 0 ? 2 : 1;
           const rowSpan = index % 5 === 0 ? 3 : index % 3 === 0 ? 2 : 1;
 
           return (
@@ -39,7 +41,7 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
               target="_blank"
               rel="noopener noreferrer"
               sx={{
-                gridColumn: `span ${columnSpan}`,
+                gridColumn: "span 1",
                 gridRow: `span ${rowSpan}`,
                 position: "relative",
                 borderRadius: 3,

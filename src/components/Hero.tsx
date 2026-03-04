@@ -19,7 +19,6 @@ const Hero = ({ events }: HeroProps) => {
   return (
     <Box
       sx={{
-        mb: 6,
         // Style inactive pagination bullets with transparent white background
         "& .swiper-pagination-bullet": {
           backgroundColor: "rgba(255,255,255,0.4)",
@@ -59,7 +58,7 @@ const Hero = ({ events }: HeroProps) => {
               <Box
                 sx={{
                   position: "relative",
-                  height: { xs: 340, md: 480 },
+                  height: { xs: 420, md: 480 },
                   borderRadius: 3,
                   overflow: "hidden",
                   // Subtle scale effect when slide is active
@@ -111,13 +110,14 @@ const Hero = ({ events }: HeroProps) => {
                 {/* Event content positioned over image and gradient */}
                 <Stack
                   spacing={2}
+                  maxWidth={1400}
                   sx={{
                     position: "relative",
                     zIndex: 2,
                     height: "100%",
                     justifyContent: "center",
                     width: "100%",
-                    maxWidth: 1400,
+                    maxWidth: "85%",
                     mx: "auto",
                     px: { xs: 3, md: 6 },
                     color: "#fff",
@@ -126,7 +126,14 @@ const Hero = ({ events }: HeroProps) => {
                     transition: "all 900ms ease",
                   }}
                 >
-                  <Typography variant="h3" fontWeight={700}>
+                  <Typography variant="h3" fontWeight={700} sx={{
+                    fontSize: {
+                      xs: "1.8rem",
+                      sm: "2.2rem",
+                      md: "2.8rem",
+                      lg: "3.5rem",
+                    }
+                  }}>
                     {event.title}
                   </Typography>
 
