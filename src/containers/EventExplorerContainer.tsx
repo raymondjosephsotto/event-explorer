@@ -33,17 +33,27 @@ const EventExplorerContainer = () => {
     // Default is date ascending
     const [sort, setSort] = useState<string>("date,asc");
 
+    // Handles sort changes and resets pagination
+    const handleSortChange = (newSort: string) => {
+        setPage(0);
+        setSort(newSort);
+    };
+
+    //State: stores the page number
+    const [page, setPage] = useState(0);
+
     // debouncedQuery updates only after the user stops typing.
     // This prevents triggering API calls on every keystroke.
     const [debouncedQuery, setDebouncedQuery] = useState<string>(query);
 
     //set the custom hook (useEvents)logic:
-    const { events, isLoading, error, refetch } = useEvents(debouncedQuery, sort);
+    const { events, isLoading, error, refetch } = useEvents(debouncedQuery, sort, page);
 
     // Effect: debounce query input before triggering API fetch
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedQuery(query);
+            setPage(0); // reset pagination when query changes
         }, 500); //wait 500ms after user stops typing
 
         return () => {
@@ -84,7 +94,7 @@ const EventExplorerContainer = () => {
                 query={query}
                 handleQueryChange={handleQueryChange}
                 sort={sort}
-                setSort={setSort}
+                setSort={handleSortChange}
             />
 
             {!query && !isLoading && events.length > 0 && (

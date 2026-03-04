@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchEventsByQuery } from "../api/events";
 
 // Custom Hook: encapsulates event fetching logic
-export const useEvents = (query: string, sort: string) => {
+export const useEvents = (query: string, sort: string, page: number) => {
   // useQuery manages server-state lifecycle for us.
   // It handles fetching, caching, loading state, error state,
   // background refetching, and deduplication automatically.
@@ -12,11 +12,11 @@ export const useEvents = (query: string, sort: string) => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['events', query, sort],
+    queryKey: ['events', query, sort, page],
     // queryKey uniquely identifies this query in TanStack's cache.
     // If 'query' changes, TanStack treats it as a new query and refetches.
 
-    queryFn: ({ signal }) => fetchEventsByQuery(query, sort, signal),
+    queryFn: ({ signal }) => fetchEventsByQuery(query, sort, page, signal),
     // queryFn is the function that actually fetches data from the server.
     // It must return a Promise. TanStack calls this internally.
 
