@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import type { ChipProps } from "@mui/material/Chip";
 import { EventCard, EventContent, EventImage, EventsGrid } from "./EventList.styles";
 import type { Event } from "../types/event.types";
+import { AbstractEventBackground } from "./AbstractEventBackground";
 
 type EventListProps = {
   events: Event[];
@@ -143,9 +144,14 @@ const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) 
           {events.map((event) => (
             <Grid size={12} key={event.id}>
               <EventCard>
-                <EventImage
-                  image={event.image}
-                />
+
+                {event.image ? (
+                  <EventImage
+                    image={event.image}
+                  />
+                ) : (
+                  <AbstractEventBackground event={event} />
+                )}
 
                 <EventContent>
                   <Typography gutterBottom variant="h5" component="div">

@@ -53,15 +53,34 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
               }}
             >
               <Box
-                component="img"
-                src={event.image}
-                alt={event.title}
                 sx={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
                 }}
-              />
+              >
+                {event.image ? (
+                  <Box
+                    component="img"
+                    src={event.image}
+                    alt={event.title}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      background:
+                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)",
+                    }}
+                  />
+                )}
+              </Box>
 
               <Box
                 sx={{
