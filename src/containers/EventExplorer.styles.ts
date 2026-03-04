@@ -1,17 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
 
-// Sticky navigation wrapper
-export const StickyNav = styled(Box)(({ theme }) => ({
-  position: "sticky",
-  top: 0,
-  zIndex: 1100,
-  backgroundColor: theme.palette.background.paper,
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  paddingTop: theme.spacing(2),
-  paddingBottom: theme.spacing(2),
-}));
-
 export const SearchContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== "hasQuery",
 })<{ hasQuery: boolean }>(({ theme, hasQuery }) => ({
