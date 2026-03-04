@@ -68,15 +68,28 @@ const Hero = ({ events }: HeroProps) => {
                 }}
               >
                 {/* Background image layer */}
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${event.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                />
+                {event.image ? (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      backgroundImage: `url(${event.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      background:
+                        "linear-gradient(135deg, #1f2937 0%, #4c1d95 50%, #7e22ce 100%)",
+                    }}
+                  />
+                )}
 
                 {/* Dark gradient overlay for text readability */}
                 <Box
