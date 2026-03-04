@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useEvents } from "../hooks/useEvents";
 import EventList from "../components/EventList";
-import Filters from "../components/Filters";
 import Hero from "../components/Hero";
 import TrendingMasonry from "../components/TrendingMasonry";
 import ErrorState from "../components/ErrorState";
-import { Container, Box, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { StickyNav, SearchContainer, SortContainer, PageContentWrapper } from "./EventExplorer.styles";
+import StickyNavigation from "../components/StickyNavigation";
+import { Container, Box } from "@mui/material";
+import { PageContentWrapper } from "./EventExplorer.styles";
 
 const EventExplorerContainer = () => {
     // Initialize query state from URL query param (if present)
@@ -80,56 +80,12 @@ const EventExplorerContainer = () => {
     return (
         <Box>
             {/* Sticky Navigation Bar */}
-            <StickyNav>
-                <Container>
-                    <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={{ xs: query.trim().length > 0 ? 2 : 0, md: 2 }}
-                        alignItems={{ md: "center" }}
-                        justifyContent="space-between"
-                        sx={{}}
-                    >
-                        <SearchContainer hasQuery={query.trim().length > 0}>
-                            <Filters
-                                query={query}
-                                handleQueryChange={handleQueryChange}
-                            />
-                        </SearchContainer>
-
-                        <SortContainer hasQuery={query.trim().length > 0}>
-                            <FormControl
-                                fullWidth
-                                sx={{
-                                    minWidth: { md: 220 },
-                                }}
-                            >
-                                <InputLabel id="sort-label" htmlFor="sort-select">
-                                    Sort By
-                                </InputLabel>
-                                <Select
-                                    id="sort-select"
-                                    labelId="sort-label"
-                                    value={sort}
-                                    label="Sort By"
-                                    onChange={(event) =>
-                                        setSort(event.target.value)
-                                    }
-                                >
-                                    <MenuItem value="date,asc">
-                                        Date Ascending
-                                    </MenuItem>
-                                    <MenuItem value="date,desc">
-                                        Date Descending
-                                    </MenuItem>
-                                    <MenuItem value="name,asc">
-                                        Name Ascending
-                                    </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </SortContainer>
-                    </Stack>
-                </Container>
-            </StickyNav>
+            <StickyNavigation
+                query={query}
+                handleQueryChange={handleQueryChange}
+                sort={sort}
+                setSort={setSort}
+            />
 
             {!query && !isLoading && events.length > 0 && (
                 <Hero events={events} />
