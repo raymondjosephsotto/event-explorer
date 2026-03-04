@@ -1,4 +1,5 @@
-import { TextField } from "@mui/material";
+import { TextField, InputAdornment, IconButton } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 
 type FiltersProps = {
   query: string;
@@ -6,7 +7,13 @@ type FiltersProps = {
 };
 
 const Filters = ({ query, handleQueryChange }: FiltersProps) => {
-
+  const handleClear = () => {
+    // Create a synthetic event to maintain consistency with handleQueryChange
+    const event = {
+      target: { value: "" },
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleQueryChange(event);
+  };
 
   return (
     <TextField
@@ -18,6 +25,22 @@ const Filters = ({ query, handleQueryChange }: FiltersProps) => {
       // TS: Updates query state when the input value changes
       onChange={handleQueryChange}
       fullWidth
+      slotProps={{
+        input: {
+          endAdornment: query && (
+            <InputAdornment position="end">
+              <IconButton
+                size="small"
+                onClick={handleClear}
+                edge="end"
+                aria-label="clear search"
+              >
+                <ClearIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        },
+      }}
     />
   );
 };
