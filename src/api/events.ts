@@ -45,9 +45,6 @@ export const fetchEventsByQuery = async (query: string, sort: string, signal?: A
   // Extract Ticketmaster events array safely
   const events: TicketmasterEvent[] = rawData._embedded?.events ?? [];
 
-console.log("Fetched events length:", events.length);
-console.log("First event:", events[0]);
-
   return events.map((event) => {
     const venue = event._embedded?.venues?.[0]?.name ?? "Unknown Venue";
     const city = event._embedded?.venues?.[0]?.city?.name ?? "Unknown";
@@ -64,7 +61,7 @@ console.log("First event:", events[0]);
       event.images
         ?.slice()
         .sort((a, b) => (b.width ?? 0) - (a.width ?? 0))[0]
-        ?.url ?? "/placeholder-hero.jpg";
+        ?.url ?? null;
 
     return {
       id: event.id,

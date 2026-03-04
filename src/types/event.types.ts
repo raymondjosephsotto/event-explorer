@@ -7,5 +7,5 @@ export type Event = {
   time: string;
   categories: string[];
   url: string;
-  image: string;
+  image: string | null;
 };
