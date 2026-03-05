@@ -1,11 +1,14 @@
-import { Box, Typography, Chip } from "@mui/material";
+import { Box, Typography, Chip, Stack } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import EventIcon from "@mui/icons-material/Event";
 import type { Event } from "../types/event.types";
 
 interface TrendingMasonryProps {
   events: Event[];
+  location?: string;
 }
 
-export default function TrendingMasonry({ events }: TrendingMasonryProps) {
+export default function TrendingMasonry({ events, location }: TrendingMasonryProps) {
   if (!events || events.length === 0) return null;
 
   return (
@@ -18,7 +21,7 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
           lg: "3.5rem",
         }
       }}>
-        Trending Events
+        {location ? `Trending Events in ${location}` : "Trending Events"}
       </Typography>
 
       <Box
@@ -32,6 +35,14 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
       >
         {events.map((event, index) => {
           const rowSpan = index % 5 === 0 ? 3 : index % 3 === 0 ? 2 : 1;
+
+          const formattedDate = event.date
+            ? new Date(event.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+            : "";
 
           return (
             <Box
@@ -129,14 +140,49 @@ export default function TrendingMasonry({ events }: TrendingMasonryProps) {
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
+                    lineHeight: 1.2,
+                    paddingBottom: 1.5,
                   }}
                 >
                   {event.title}
                 </Typography>
 
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  {event.venue} • {event.date}
-                </Typography>
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  <EventIcon sx={{ fontSize: 16, opacity: 0.8 }} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      opacity: 0.75,
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {formattedDate}
+                    {event.time
+                      ? ` • ${new Date(`1970-01-01T${event.time}`).toLocaleTimeString(
+                        "en-US",
+                        { hour: "numeric", minute: "2-digit" }
+                      )}`
+                      : ""}
+                  </Typography>
+                </Stack>
+
+                <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <LocationOnIcon sx={{ fontSize: 16, opacity: 0.8 }} />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        opacity: 0.85,
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {event.venue}
+                    </Typography>
+                  </Stack>
+
+                </Stack>
               </Box>
             </Box>
           );

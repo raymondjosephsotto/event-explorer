@@ -54,13 +54,16 @@ const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) 
   const formatTime = (timeString: string) => {
     if (!timeString) return "";
 
-    const date = new Date(timeString);
+    // Ticketmaster localTime comes in "HH:mm:ss" format.
+    // We attach a dummy date to create a valid Date object.
+    const date = new Date(`1970-01-01T${timeString}`);
 
     if (isNaN(date.getTime())) return "";
 
     return new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
       minute: "2-digit",
+      hour12: true,
     }).format(date);
   };
 
