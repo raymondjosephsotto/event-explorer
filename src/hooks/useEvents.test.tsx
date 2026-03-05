@@ -22,7 +22,7 @@ const createWrapper = () => {
 describe('useEvents', () => {
   it('returns loading state initially', async () => {
     const { result } = renderHook(
-      () => useEvents('New York', 'date,asc'),
+      () => useEvents('New York', 'date,asc', 0),
       {
         wrapper: createWrapper(),
       }
