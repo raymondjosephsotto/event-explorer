@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useEvents } from "../hooks/useEvents";
+import { useUserLocation } from "../hooks/useUserLocation";
 import EventList from "../components/EventList";
 import Hero from "../components/Hero";
 import TrendingMasonry from "../components/TrendingMasonry";
@@ -42,12 +43,18 @@ const EventExplorerContainer = () => {
     //State: stores the page number
     const [page, setPage] = useState(0);
 
+    // Resolve user location (IP → browser → default fallback)
+    const { coords, city, isResolving } = useUserLocation();
+
     // debouncedQuery updates only after the user stops typing.
     // This prevents triggering API calls on every keystroke.
     const [debouncedQuery, setDebouncedQuery] = useState<string>(query);
 
     //set the custom hook (useEvents)logic:
-    const { events, isLoading, error, refetch } = useEvents(debouncedQuery, sort, page);
+    const effectiveQuery = debouncedQuery.trim().length > 0 ? debouncedQuery : city;
+
+    const { events, isLoading, error, refetch } =
+        useEvents(effectiveQuery, sort, page, coords);
 
     // Effect: debounce query input before triggering API fetch
     useEffect(() => {
@@ -97,10 +104,10 @@ const EventExplorerContainer = () => {
                 setSort={handleSortChange}
             />
 
-            {!query && !isLoading && events.length > 0 && (
+            {!query && !isLoading && !isResolving && events.length > 0 && (
                 <Hero events={events} />
             )}
-            {!query && !isLoading && events.length > 0 && (
+            {!query && !isLoading && !isResolving && events.length > 0 && (
                 <PageContentWrapper py={6}>
                     <TrendingMasonry events={events.slice(0, 12)} />
                 </PageContentWrapper>
