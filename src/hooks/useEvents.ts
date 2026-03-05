@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 import { fetchEventsByQuery } from "../api/events";
 
 // Custom Hook: encapsulates event fetching logic
-export const useEvents = (query: string, sort: string, page: number) => {
+export const useEvents = (
+  query: string,
+  sort: string,
+  page: number,
+  coords?: { lat: number; lng: number } | null) => {
   const queryClient = useQueryClient();
   // useQuery manages server-state lifecycle for us.
   // It handles fetching, caching, loading state, error state,
@@ -14,11 +18,11 @@ export const useEvents = (query: string, sort: string, page: number) => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['events', query, sort, page],
+    queryKey: ['events', query, sort, page, coords],
     // queryKey uniquely identifies this query in TanStack's cache.
     // If 'query' changes, TanStack treats it as a new query and refetches.
 
-    queryFn: ({ signal }) => fetchEventsByQuery(query, sort, page, signal),
+    queryFn: ({ signal }) => fetchEventsByQuery(query, sort, page, signal, coords),
     // queryFn is the function that actually fetches data from the server.
     // It must return a Promise. TanStack calls this internally.
 
@@ -35,10 +39,10 @@ export const useEvents = (query: string, sort: string, page: number) => {
     const nextPage = page + 1;
 
     queryClient.prefetchQuery({
-      queryKey: ['events', query, sort, nextPage],
-      queryFn: ({ signal }) => fetchEventsByQuery(query, sort, nextPage, signal),
+      queryKey: ['events', query, sort, nextPage, coords],
+      queryFn: ({ signal }) => fetchEventsByQuery(query, sort, nextPage, signal, coords),
     });
-  }, [query, sort, page, queryClient]);
+  }, [query, sort, page, coords, queryClient]);
 
   // We normalize the return shape so the rest of the app
   // does not need to know it's using TanStack.

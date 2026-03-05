@@ -30,10 +30,20 @@ type TicketmasterEvent = {
   }[];
 };
 
-export const fetchEventsByQuery = async (query: string, sort: string, page: number, signal?: AbortSignal): Promise<Event[]> => {
+export const fetchEventsByQuery = async (
+  query: string,
+  sort: string,
+  page: number,
+  signal?: AbortSignal,
+  coords?: { lat: number, lng: number } | null
+): Promise<Event[]> => {
 
+  //Set an condition if coords are available, then fetch API with coordinates, fallback to a non-coordinate fetch
   const response = await fetch(
-    `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${query.trim() || "concert"}&sort=${sort}&page=${page}&size=20`, { signal }
+    `${coords
+      ? `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&latlong=${coords.lat},${coords.lng}&radius=50&unit=miles&sort=${sort}&page=${page}&size=20`
+      : `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${import.meta.env.VITE_TICKETMASTER_API_KEY}&keyword=${query.trim() || "concert"}&sort=${sort}&page=${page}&size=20`
+    }`, { signal }
   );
 
   const rawData: {
