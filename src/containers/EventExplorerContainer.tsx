@@ -53,8 +53,14 @@ const EventExplorerContainer = () => {
     //set the custom hook (useEvents)logic:
     const effectiveQuery = debouncedQuery.trim().length > 0 ? debouncedQuery : city;
 
+    // Only use geolocation coords when there is NO manual search query.
+    // If the user types a city (e.g., "New York"), we ignore coords
+    // so the API does not prioritize the original geolocation (e.g., Denver).
+    const effectiveCoords =
+        debouncedQuery.trim().length > 0 ? undefined : coords;
+
     const { events, isLoading, error, refetch } =
-        useEvents(effectiveQuery, sort, page, coords);
+        useEvents(effectiveQuery, sort, page, effectiveCoords);
 
     // Effect: debounce query input before triggering API fetch
     useEffect(() => {
