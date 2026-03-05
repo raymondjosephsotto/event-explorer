@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { fetchEventsByQuery } from "../api/events";
 
 // Custom Hook: encapsulates event fetching logic
 export const useEvents = (query: string, sort: string, page: number) => {
+  const queryClient = useQueryClient();
   // useQuery manages server-state lifecycle for us.
   // It handles fetching, caching, loading state, error state,
   // background refetching, and deduplication automatically.
@@ -24,6 +26,19 @@ export const useEvents = (query: string, sort: string, page: number) => {
     // enabled acts like a guard condition.
     // The query will only run if this evaluates to true.
   });
+
+  // Prefetch the next page of events so pagination feels instant
+  useEffect(() => {
+    //only prefetch when the user is actually searching
+    if (!query.trim()) return;
+
+    const nextPage = page + 1;
+
+    queryClient.prefetchQuery({
+      queryKey: ['events', query, sort, nextPage],
+      queryFn: ({ signal }) => fetchEventsByQuery(query, sort, nextPage, signal),
+    });
+  }, [query, sort, page, queryClient]);
 
   // We normalize the return shape so the rest of the app
   // does not need to know it's using TanStack.
