@@ -13,11 +13,24 @@ type HeroProps = {
 };
 
 const Hero = ({ events }: HeroProps) => {
+  const parseEventDate = (dateString: string): Date | null => {
+    if (!dateString) return null;
+
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (dateOnlyMatch) {
+      const [, y, m, d] = dateOnlyMatch;
+      return new Date(Number(y), Number(m) - 1, Number(d));
+    }
+
+    const parsed = new Date(dateString);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   // Helper: Format date like "October 20, 2025"
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "";
+    const date = parseEventDate(dateString);
+    if (!date) return "";
     return new Intl.DateTimeFormat("en-US", {
       month: "long",
       day: "numeric",
