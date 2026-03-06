@@ -1,4 +1,4 @@
-import { Container, Stack, FormControl, InputLabel, Select, MenuItem, Typography, Box } from "@mui/material";
+import { Container, Stack, FormControl, InputLabel, Select, MenuItem, Typography, Box, Link } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { SearchContainer, SortContainer } from "../containers/EventExplorer.styles";
 import Filters from "./Filters";
@@ -32,36 +32,50 @@ const StickyNavigation = ({ query, handleQueryChange, sort, setSort }: StickyNav
                     alignItems={{ md: "center" }}
                 >
                     {/* Logo + Title */}
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        justifyContent={{ xs: "center", md: "flex-start" }}
+                    <Link 
+                        href="/" 
+                        underline="none" 
+                        color="inherit"
+                        sx={{ 
+                            display: 'flex',
+                            justifyContent: { xs: "center", md: "flex-start" },
+                            width: { xs: '100%', md: 'auto' },
+                            '&:hover': {
+                                opacity: 0.8,
+                            },
+                            transition: 'opacity 0.2s ease',
+                        }}
                     >
-                        <Box
-                            component="img"
-                            src={logo}
-                            alt="Event Explorer Logo"
-                            sx={{ height: { xs: 35, md: 50 } }}
-                        />
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            sx={{
-                                fontFamily: '"Helvetica Neue"',
-                                fontWeight: 700,
-                                color: 'inherit',
-                                textDecoration: 'none',
-                                letterSpacing: -0.5,
-                                fontSize: {
-                                    xs: 18,
-                                    md: 20,
-                                }
-                            }}
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
                         >
-                            Event Explorer
-                        </Typography>
-                    </Stack>
+                            <Box
+                                component="img"
+                                src={logo}
+                                alt="Event Explorer Logo"
+                                sx={{ height: { xs: 35, md: 50 } }}
+                            />
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                sx={{
+                                    fontFamily: '"Helvetica Neue"',
+                                    fontWeight: 700,
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                    letterSpacing: -0.5,
+                                    fontSize: {
+                                        xs: 18,
+                                        md: 20,
+                                    }
+                                }}
+                            >
+                                Event Explorer
+                            </Typography>
+                        </Stack>
+                    </Link>
 
                     {/* Search Bar + Select Dropdown */}
                     <Stack

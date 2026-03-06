@@ -32,6 +32,7 @@ export const SortContainer = styled(Box, {
     flexBasis: hasQuery ? 260 : 0,
     maxWidth: hasQuery ? 260 : 0,
     opacity: hasQuery ? 1 : 0,
+    pointerEvents: hasQuery ? "auto" : "none",
   },
 }));
 
