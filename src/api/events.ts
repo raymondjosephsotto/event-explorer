@@ -55,7 +55,7 @@ const fetchFromTicketmaster = async (
 
   const params = new URLSearchParams({
     apikey: TICKETMASTER_API_KEY,
-    size: "20",
+    size: "200",
     startDateTime,
     endDateTime,
     ...extraParams,
@@ -123,8 +123,9 @@ export const fetchEventsByQuery = async (
     }
   }
 
-  // Final pipeline: map Ticketmaster → app Events, then filter for upcoming only
-  return raw
-    .map(mapTicketmasterEvent)
-    .filter((event) => isUpcomingEvent(event.date, event.time));
+  // Final pipeline: map Ticketmaster → app Events, dedupe, then filter for upcoming only
+  // Apply deduplication to all paths to ensure no duplicate events appear
+  const mapped = raw.map(mapTicketmasterEvent);
+  const deduped = dedupeById(mapped);
+  return deduped.filter((event) => isUpcomingEvent(event.date, event.time));
 };

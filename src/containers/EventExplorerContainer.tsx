@@ -100,6 +100,22 @@ const EventExplorerContainer = () => {
         setQuery(newQueryValue);
     };
 
+    // Filter events to show only those within the next month
+    const getEventsForNextMonth = () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const oneMonthFromNow = new Date(today);
+        oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+        
+        return events.filter(event => {
+            if (!event.date) return false;
+            
+            const eventDate = new Date(event.date);
+            return eventDate >= today && eventDate <= oneMonthFromNow;
+        });
+    };
+
     return (
         <Box>
             {/* Sticky Navigation Bar */}
@@ -115,7 +131,10 @@ const EventExplorerContainer = () => {
             )}
             {!query && !isLoading && !isResolving && events.length > 0 && (
                 <PageContentWrapper py={6}>
-                    <TrendingMasonry events={events.slice(0, 12)} />
+                    <TrendingMasonry 
+                        events={getEventsForNextMonth()} 
+                        location={city}
+                    />
                 </PageContentWrapper>
             )}
 
