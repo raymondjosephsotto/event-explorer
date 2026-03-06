@@ -33,7 +33,7 @@ const StickyNavigation = ({ query, handleQueryChange, sort, setSort }: StickyNav
                 >
                     {/* Logo + Title */}
                     <Link 
-                        href="/" 
+                        href={import.meta.env.BASE_URL} 
                         underline="none" 
                         color="inherit"
                         sx={{ 
