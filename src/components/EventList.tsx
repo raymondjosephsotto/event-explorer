@@ -39,9 +39,23 @@ const getCategoryColor = (category: string): ChipProps["color"] => {
 };
 
 const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) => {
+  const parseEventDate = (dateString: string): Date | null => {
+    if (!dateString) return null;
+
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (dateOnlyMatch) {
+      const [, y, m, d] = dateOnlyMatch;
+      return new Date(Number(y), Number(m) - 1, Number(d));
+    }
+
+    const parsed = new Date(dateString);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   //Helper to convert the date to Month DD, YYYY
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseEventDate(dateString);
+    if (!date) return "";
 
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",

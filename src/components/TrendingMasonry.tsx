@@ -11,6 +11,19 @@ interface TrendingMasonryProps {
 export default function TrendingMasonry({ events, location }: TrendingMasonryProps) {
   if (!events || events.length === 0) return null;
 
+  const parseEventDate = (dateString: string): Date | null => {
+    if (!dateString) return null;
+
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (dateOnlyMatch) {
+      const [, y, m, d] = dateOnlyMatch;
+      return new Date(Number(y), Number(m) - 1, Number(d));
+    }
+
+    const parsed = new Date(dateString);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   return (
     <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
       <Typography variant="h4" fontWeight={700} sx={{
@@ -35,13 +48,13 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
       >
         {events.map((event, index) => {
           const rowSpan = index % 5 === 0 ? 3 : index % 3 === 0 ? 2 : 1;
-
-          const formattedDate = event.date
-            ? new Date(event.date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
+          const parsedDate = parseEventDate(event.date);
+          const formattedDate = parsedDate
+            ? parsedDate.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
             : "";
 
           return (
