@@ -4,6 +4,8 @@ import { mapTicketmasterEvent } from "../utils/eventMapper";
 import { isUpcomingEvent } from "../utils/eventValidator";
 import { getCityVariants, dedupeById } from "../utils/citySearch";
 
+const TICKETMASTER_API_KEY = import.meta.env.VITE_TICKETMASTER_API_KEY;
+
 /**
  * API orchestration layer for Ticketmaster event discovery.
  *
@@ -43,10 +45,16 @@ const fetchFromTicketmaster = async (
   extraParams: Record<string, string>,
   signal?: AbortSignal
 ): Promise<TicketmasterEvent[]> => {
+  if (!TICKETMASTER_API_KEY || TICKETMASTER_API_KEY === "undefined") {
+    throw new Error(
+      "Missing Ticketmaster API key. Set VITE_TICKETMASTER_API_KEY in your environment before building the app."
+    );
+  }
+
   const { startDateTime, endDateTime } = buildDateRangeParams();
 
   const params = new URLSearchParams({
-    apikey: import.meta.env.VITE_TICKETMASTER_API_KEY,
+    apikey: TICKETMASTER_API_KEY,
     size: "20",
     startDateTime,
     endDateTime,
