@@ -2,40 +2,18 @@ import React from "react";
 import EventIcon from "@mui/icons-material/Event";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
-import { Box, Button, CardActions, Chip, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Button, CardActions, Skeleton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import type { ChipProps } from "@mui/material/Chip";
 import { EventCard, EventContent, EventImage, EventsGrid } from "./EventList.styles";
 import type { Event } from "../types/event.types";
 import { AbstractEventBackground } from "./AbstractEventBackground";
+import EventCategoryChips from "./EventCategoryChips";
 
 type EventListProps = {
   events: Event[];
   isLoading: boolean;
   error: string | null;
   onClearSearch: () => void;
-};
-
-const getCategoryColor = (category: string): ChipProps["color"] => {
-  const normalized = category.toLowerCase();
-
-  if (normalized.includes("music") || normalized.includes("r&b")) {
-    return "secondary";
-  }
-
-  if (normalized.includes("sport")) {
-    return "success";
-  }
-
-  if (normalized.includes("comedy")) {
-    return "warning";
-  }
-
-  if (normalized.includes("community") || normalized.includes("civic")) {
-    return "info";
-  }
-
-  return "primary";
 };
 
 const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) => {
@@ -175,23 +153,7 @@ const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) 
                     {event.title}
                   </Typography>
 
-                  {event.categories.length > 0 && (
-                    <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap" }}>
-                      {event.categories.slice(0, 2).map((category) => (
-                        <Chip
-                          key={category}
-                          label={category}
-                          size="small"
-                          color={getCategoryColor(category)}
-                          variant="filled"
-                          sx={{
-                            fontSize: "0.75rem",
-                            fontWeight: 500,
-                          }}
-                        />
-                      ))}
-                    </Stack>
-                  )}
+                  <EventCategoryChips categories={event.categories} maxVisible={2} stackSx={{ mb: 1 }} />
 
                   <Stack spacing={0.5} sx={{ mt: 1 }}>
                     <Stack direction="row" spacing={1} alignItems="center">

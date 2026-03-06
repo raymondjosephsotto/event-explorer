@@ -1,7 +1,8 @@
-import { Box, Typography, Chip, Stack } from "@mui/material";
+import { Box, Typography, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EventIcon from "@mui/icons-material/Event";
 import type { Event } from "../types/event.types";
+import EventCategoryChips from "./EventCategoryChips";
 
 interface TrendingMasonryProps {
   events: Event[];
@@ -128,22 +129,11 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
                   color: "#fff",
                 }}
               >
-                {event.categories &&
-                  event.categories.length > 0 &&
-                  !["Other", "Undefined"].includes(event.categories[0]) && (
-                    <Chip
-                      label={event.categories[0]}
-                      size="small"
-                      sx={{
-                        mb: 1,
-                        bgcolor: "rgba(255,255,255,0.2)",
-                        color: "#fff",
-                        backdropFilter: "blur(6px)",
-                        alignSelf: "flex-start",
-                        width: "fit-content",
-                      }}
-                    />
-                  )}
+                <EventCategoryChips
+                  categories={event.categories}
+                  maxVisible={1}
+                  stackSx={{ mb: 1 }}
+                />
 
                 <Typography
                   variant="h6"
