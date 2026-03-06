@@ -28,11 +28,9 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
   return (
     <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
       <Typography variant="h4" fontWeight={700} sx={{
-        mb: 3, fontSize: {
-          xs: "1.8rem",
-          sm: "2.2rem",
-          md: "2.8rem",
-          lg: "3.5rem",
+        mb: 4, fontSize: {
+          xs: "1.25rem",
+          md: "2.25rem",
         }
       }}>
         {location ? `Trending Events in ${location}` : "Trending Events"}
