@@ -72,4 +72,33 @@ describe('EventList', () => {
             screen.getByText("Error: Something went wrong")
         ).toBeInTheDocument();
     });
+
+    it('hides placeholder categories and deduplicates exact category names', () => {
+        const mockEvents = [
+            {
+                id: '2',
+                title: 'Indie Night',
+                city: 'Austin',
+                date: '2026-03-10',
+                url: 'https://example.com/indie-night',
+                image: null,
+                venue: 'Downtown Stage',
+                time: '19:30:00',
+                categories: ['Uncategorized', 'Alternative', 'Alternative', 'Alternative Rock'],
+            },
+        ];
+
+        render(
+            <EventList
+                events={mockEvents}
+                isLoading={false}
+                error={null}
+                onClearSearch={() => {}}
+            />
+        );
+
+        expect(screen.queryByText('Uncategorized')).not.toBeInTheDocument();
+        expect(screen.getAllByText('Alternative')).toHaveLength(1);
+        expect(screen.getByText('Alternative Rock')).toBeInTheDocument();
+    });
 });
