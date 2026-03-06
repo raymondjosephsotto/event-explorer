@@ -78,6 +78,12 @@ Create a `.env` file in the project root:
 VITE_TICKETMASTER_API_KEY=your_api_key_here
 ```
 
+For GitHub Pages deployment via GitHub Actions, also add a repository secret:
+
+- `VITE_TICKETMASTER_API_KEY` = your Ticketmaster API key
+
+GitHub path: `Settings` -> `Secrets and variables` -> `Actions` -> `New repository secret`.
+
 ---
 
 ## Build
