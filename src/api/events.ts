@@ -2,7 +2,7 @@ import type { Event } from "../types/event.types";
 import type { TicketmasterEvent } from "../utils/eventMapper";
 import { mapTicketmasterEvent } from "../utils/eventMapper";
 import { isUpcomingEvent } from "../utils/eventValidator";
-import { getCityVariants, dedupeById } from "../utils/citySearch";
+import { getCityVariants, dedupeById, dedupeByContent } from "../utils/citySearch";
 
 const TICKETMASTER_API_KEY = import.meta.env.VITE_TICKETMASTER_API_KEY;
 
@@ -40,11 +40,11 @@ const buildDateRangeParams = () => {
 
 // Low-level fetch wrapper that hits the Ticketmaster Discovery API
 // Accepts any extra parameters (keyword, city, latlong, etc.)
-// Returns raw Ticketmaster events or throws on non-200 status
+// Returns raw Ticketmaster events and total pages, or throws on non-200 status
 const fetchFromTicketmaster = async (
   extraParams: Record<string, string>,
   signal?: AbortSignal
-): Promise<TicketmasterEvent[]> => {
+): Promise<{ events: TicketmasterEvent[]; totalPages: number }> => {
   if (!TICKETMASTER_API_KEY || TICKETMASTER_API_KEY === "undefined") {
     throw new Error(
       "Missing Ticketmaster API key. Set VITE_TICKETMASTER_API_KEY in your environment before building the app."
@@ -55,7 +55,7 @@ const fetchFromTicketmaster = async (
 
   const params = new URLSearchParams({
     apikey: TICKETMASTER_API_KEY,
-    size: "200",
+    size: "20",
     startDateTime,
     endDateTime,
     ...extraParams,
@@ -73,43 +73,51 @@ const fetchFromTicketmaster = async (
 
   const rawData: {
     _embedded?: { events?: TicketmasterEvent[] };
+    page?: { totalPages?: number };
   } = await response.json();
 
-  return rawData._embedded?.events ?? [];
+  return {
+    events: rawData._embedded?.events ?? [],
+    totalPages: rawData.page?.totalPages ?? 1,
+  };
 };
 
 // Main entry point — fetches, maps, and filters Ticketmaster events
-// Public API: called from useEvents hook via React Query
+// Public API: called from useEvents / useInfiniteEvents hooks via React Query
 export const fetchEventsByQuery = async (
   query: string,
   sort: string,
   page: number,
   signal?: AbortSignal,
   coords?: { lat: number; lng: number } | null
-): Promise<Event[]> => {
+): Promise<{ events: Event[]; hasMore: boolean }> => {
   const shared = { sort, page: String(page) };
   let raw: TicketmasterEvent[] = [];
+  let maxTotalPages = 1;
 
   // Path 1: Geolocation-based search
   // When user location is available, search by lat/long radius
   if (coords) {
-    raw = await fetchFromTicketmaster(
+    const result = await fetchFromTicketmaster(
       { ...shared, latlong: `${coords.lat},${coords.lng}`, radius: "50", unit: "miles" },
       signal
     );
+    raw = result.events;
+    maxTotalPages = result.totalPages;
   } else {
     // Path 2: Text-based search (keyword or city)
     const trimmed = query.trim();
 
     // First, try keyword search (catches artist names, event names, etc.)
-    const keywordResults = await fetchFromTicketmaster(
+    const keywordResult = await fetchFromTicketmaster(
       { ...shared, keyword: trimmed || "concert" },
       signal
     );
 
     if (!trimmed) {
       // No query provided: use default keyword results
-      raw = keywordResults;
+      raw = keywordResult.events;
+      maxTotalPages = keywordResult.totalPages;
     } else {
       // Query provided: combine keyword + city searches and dedupe
       // This handles cases like "New York" that work better with city param
@@ -119,13 +127,63 @@ export const fetchEventsByQuery = async (
         )
       );
 
-      raw = dedupeById([...keywordResults, ...cityResults.flat()]);
+      raw = dedupeById([...keywordResult.events, ...cityResults.flatMap((r) => r.events)]);
+      maxTotalPages = Math.max(keywordResult.totalPages, ...cityResults.map((r) => r.totalPages));
     }
   }
 
   // Final pipeline: map Ticketmaster → app Events, dedupe, then filter for upcoming only
   // Apply deduplication to all paths to ensure no duplicate events appear
   const mapped = raw.map(mapTicketmasterEvent);
-  const deduped = dedupeById(mapped);
-  return deduped.filter((event) => isUpcomingEvent(event.date, event.time));
+  const deduped = dedupeByContent(dedupeById(mapped));
+  const events = deduped.filter((event) => isUpcomingEvent(event.date, event.time));
+
+  return { events, hasMore: page < maxTotalPages - 1 };
+};
+
+// Fetches a paginated set of events within the next month for the trending section.
+// Uses a 1-month window so the masonry grid shows a calendar-month of events.
+export const fetchTrendingEvents = async (
+  page: number,
+  signal?: AbortSignal,
+  coords?: { lat: number; lng: number } | null,
+  city?: string
+): Promise<{ events: Event[]; hasMore: boolean }> => {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const oneMonthLater = new Date(startOfToday);
+  oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+  const dateOverrides: Record<string, string> = {
+    size: "20",
+    sort: "date,asc",
+    page: String(page),
+    startDateTime: formatDateTime(startOfToday),
+    endDateTime: formatDateTime(oneMonthLater),
+  };
+
+  let raw: TicketmasterEvent[] = [];
+  let maxTotalPages = 1;
+
+  if (coords) {
+    const result = await fetchFromTicketmaster(
+      { ...dateOverrides, latlong: `${coords.lat},${coords.lng}`, radius: "50", unit: "miles" },
+      signal
+    );
+    raw = result.events;
+    maxTotalPages = result.totalPages;
+  } else if (city) {
+    const results = await Promise.all(
+      getCityVariants(city).map((c) =>
+        fetchFromTicketmaster({ ...dateOverrides, city: c }, signal)
+      )
+    );
+    raw = dedupeById(results.flatMap((r) => r.events));
+    maxTotalPages = Math.max(...results.map((r) => r.totalPages));
+  }
+
+  const mapped = raw.map(mapTicketmasterEvent);
+  const events = dedupeByContent(dedupeById(mapped)).filter((e) => isUpcomingEvent(e.date, e.time));
+
+  return { events, hasMore: page < maxTotalPages - 1 };
 };

@@ -49,7 +49,7 @@ export const useEvents = (
   // 'data' can be undefined before the first fetch,
   // so we fallback to an empty array for safety.
   return {
-    events: data ?? [],
+    events: data?.events ?? [],
     isLoading,
     error: error instanceof Error ? error.message : null,
     refetch

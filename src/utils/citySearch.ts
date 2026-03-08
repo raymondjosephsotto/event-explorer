@@ -67,3 +67,66 @@ export const dedupeById = <T extends { id: string }>(items: T[]): T[] => {
 
   return unique;
 };
+
+/**
+ * Deduplicates events that share the same title, date, and venue
+ * but have different IDs (common with Ticketmaster multi-source listings).
+ */
+export const dedupeByContent = <T extends { title: string; date: string; venue: string }>(items: T[]): T[] => {
+  const seen = new Set<string>();
+  const unique: T[] = [];
+
+  for (const item of items) {
+    const key = `${item.title.toLowerCase().trim()}|${item.date}|${item.venue.toLowerCase().trim()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(item);
+  }
+
+  return unique;
+};
+
+/**
+ * Reorders events so that items with similar titles (e.g. same artist
+ * performing on different dates) are spread apart rather than clustered.
+ *
+ * Algorithm: group by a normalised title key, then round-robin across
+ * groups so each pick comes from a different group until all are placed.
+ */
+export const spreadSimilarEvents = <T extends { title: string }>(items: T[]): T[] => {
+  if (items.length <= 2) return items;
+
+  // Normalise: strip trailing parentheticals, convert to lowercase
+  const normTitle = (t: string) => t.toLowerCase().replace(/\s*\(.*\)$/, '').trim();
+
+  // Build ordered buckets — one per unique normalised title
+  const buckets = new Map<string, T[]>();
+  for (const item of items) {
+    const key = normTitle(item.title);
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = [];
+      buckets.set(key, bucket);
+    }
+    bucket.push(item);
+  }
+
+  // Round-robin: cycle through the buckets, taking one from each per pass
+  const result: T[] = [];
+  const queues = [...buckets.values()];
+  let emptied = 0;
+  const pointers = new Array<number>(queues.length).fill(0);
+
+  while (emptied < queues.length) {
+    for (let i = 0; i < queues.length; i++) {
+      if (pointers[i] < queues[i].length) {
+        result.push(queues[i][pointers[i]]);
+        pointers[i]++;
+        if (pointers[i] === queues[i].length) emptied++;
+      }
+    }
+  }
+
+  return result;
+};
+

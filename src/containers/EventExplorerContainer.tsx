@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useEvents } from "../hooks/useEvents";
+import { useInfiniteEvents } from "../hooks/useInfiniteEvents";
+import { useTrendingEvents } from "../hooks/useTrendingEvents";
 import { useUserLocation } from "../hooks/useUserLocation";
 import EventList from "../components/EventList";
 import Hero from "../components/Hero";
@@ -36,9 +37,6 @@ const EventExplorerContainer = () => {
     // Default is date ascending
     const [sort, setSort] = useState<string>("date,asc");
 
-    //State: stores the page number
-    const [page, setPage] = useState(0);
-
     // State: selected category chip for filtering
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -62,13 +60,12 @@ const EventExplorerContainer = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    // Handles sort changes and resets pagination
+    // Handles sort changes
     const handleSortChange = (newSort: string) => {
-        setPage(0);
         setSort(newSort);
     };
 
-    //set the custom hook (useEvents)logic:
+    //set the custom hook logic:
     const effectiveQuery = debouncedQuery.trim().length > 0 ? debouncedQuery : city;
 
     // Only use geolocation coords when there is NO manual search query.
@@ -77,14 +74,29 @@ const EventExplorerContainer = () => {
     const effectiveCoords =
         debouncedQuery.trim().length > 0 ? undefined : coords;
 
-    const { events, isLoading, error, refetch } =
-        useEvents(effectiveQuery, sort, page, effectiveCoords);
+    // Trending events for homepage (1-month window, infinite scroll)
+    const {
+        events: trendingEvents,
+        isLoading: isTrendingLoading,
+        fetchNextPage: fetchNextTrending,
+        hasNextPage: hasMoreTrending,
+        isFetchingNextPage: isFetchingMoreTrending,
+    } = useTrendingEvents(
+        effectiveCoords,
+        city
+    );
+
+    const isSearching = debouncedQuery.trim().length > 0;
+
+    const { events, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useInfiniteEvents(effectiveQuery, sort, effectiveCoords, isSearching);
+
+    const isDebouncing = query !== debouncedQuery && query.trim().length > 0;
 
     // Effect: debounce query input before triggering API fetch
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedQuery(query);
-            setPage(0); // reset pagination when query changes
         }, 500); //wait 500ms after user stops typing
 
         return () => {
@@ -137,22 +149,6 @@ const EventExplorerContainer = () => {
         );
     }, [events, activeCategory]);
 
-    // Filter events to show only those within the next month
-    const getEventsForNextMonth = () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const oneMonthFromNow = new Date(today);
-        oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-
-        return filteredEvents.filter(event => {
-            if (!event.date) return false;
-
-            const eventDate = new Date(event.date);
-            return eventDate >= today && eventDate <= oneMonthFromNow;
-        });
-    };
-
     return (
         <Box>
             {/* Sticky top nav: Logo (all) + SearchControls (desktop only) */}
@@ -168,24 +164,28 @@ const EventExplorerContainer = () => {
 
             {/* Main content */}
             <Box>
-                {!query && !isLoading && !isResolving && filteredEvents.length > 0 && (
-                    <Hero events={filteredEvents} />
+                {/* Homepage: Hero + Trending with infinite scroll */}
+                {!query && !isTrendingLoading && !isResolving && trendingEvents.length > 0 && (
+                    <Hero events={trendingEvents} />
                 )}
-                {!query && !isLoading && !isResolving && filteredEvents.length > 0 && (
+                {!query && !isTrendingLoading && !isResolving && trendingEvents.length > 0 && (
                     <PageContentWrapper py={6}>
                         <TrendingMasonry
-                            events={getEventsForNextMonth()}
+                            events={trendingEvents}
                             location={city}
+                            hasMore={hasMoreTrending}
+                            isFetchingMore={isFetchingMoreTrending}
+                            onLoadMore={fetchNextTrending}
                         />
                     </PageContentWrapper>
                 )}
 
-                {/* Events Section */}
+                {/* Search Results with infinite scroll */}
                 {error ? (
                     <PageContentWrapper py={6}>
                         <ErrorState
                             message={error}
-                            onRetry={() => refetch?.()}
+                            onRetry={() => fetchNextPage()}
                         />
                     </PageContentWrapper>
                 ) : (
@@ -193,9 +193,12 @@ const EventExplorerContainer = () => {
                         <Container sx={{ py: 4 }}>
                             <EventList
                                 events={filteredEvents}
-                                isLoading={isLoading}
-                                error={error}
+                                isLoading={isDebouncing || isLoading}
+                                error={null}
                                 onClearSearch={handleClearSearch}
+                                hasMore={hasNextPage}
+                                isFetchingMore={isFetchingNextPage}
+                                onLoadMore={fetchNextPage}
                             />
                         </Container>
                     )

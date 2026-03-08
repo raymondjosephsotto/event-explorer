@@ -1,15 +1,28 @@
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Typography, Stack, Skeleton, keyframes } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EventIcon from "@mui/icons-material/Event";
 import type { Event } from "../types/event.types";
 import { formatDate, formatTime } from "../utils/dateUtils";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
 
 interface TrendingMasonryProps {
   events: Event[];
   location?: string;
+  hasMore?: boolean;
+  isFetchingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export default function TrendingMasonry({ events, location }: TrendingMasonryProps) {
+export default function TrendingMasonry({ events, location, hasMore, isFetchingMore, onLoadMore }: TrendingMasonryProps) {
+  const sentinelRef = useIntersectionObserver(() => {
+    if (hasMore && !isFetchingMore && onLoadMore) onLoadMore();
+  }, { rootMargin: '800px' });
+
   if (!events || events.length === 0) return null;
 
   return (
@@ -50,6 +63,7 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
                 borderRadius: 3,
                 overflow: "hidden",
                 textDecoration: "none",
+                animation: `${fadeIn} 0.5s ease-out both`,
                 transition: "transform 300ms ease, box-shadow 300ms ease",
                 "&:hover": {
                   transform: "translateY(-6px)",
@@ -157,7 +171,40 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
             </Box>
           );
         })}
+
       </Box>
+
+      {/* Skeleton tiles while next page loads */}
+      {isFetchingMore && (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 3,
+            gridAutoRows: 160,
+            gridAutoFlow: "dense",
+            mt: 3,
+          }}
+        >
+          {Array.from({ length: 6 }).map((_, i) => {
+            const span = i % 5 === 0 ? 3 : i % 3 === 0 ? 2 : 1;
+            return (
+              <Skeleton
+                key={`skeleton-trending-${i}`}
+                variant="rectangular"
+                sx={{
+                  gridRow: `span ${span}`,
+                  borderRadius: 3,
+                  height: "100%",
+                }}
+              />
+            );
+          })}
+        </Box>
+      )}
+
+      {/* Invisible sentinel for infinite scroll */}
+      {hasMore && !isFetchingMore && <Box ref={sentinelRef} sx={{ height: 1 }} />}
     </Box>
   );
 }
