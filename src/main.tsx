@@ -24,6 +24,11 @@ const queryClient = new QueryClient({
   },
 });
 
+const showDevtools = import.meta.env.DEV && (
+  new URLSearchParams(window.location.search).has("rq-devtools") ||
+  localStorage.getItem("rq-devtools") === "true"
+);
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/*
@@ -39,10 +44,8 @@ createRoot(document.getElementById('root')!).render(
       
       <App />
 
-      {/* TanStack Query Devtool: Only display during development mode */}
-      {import.meta.env.DEV && (
-        <ReactQueryDevtools initialIsOpen={false} />
-      )}
+      {/* TanStack Query Devtools: opt-in via ?rq-devtools or localStorage.setItem("rq-devtools", "true") */}
+      {showDevtools && <ReactQueryDevtools initialIsOpen={false} />}
 
     </QueryClientProvider>
   </StrictMode>
