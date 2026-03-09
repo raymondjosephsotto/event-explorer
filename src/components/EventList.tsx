@@ -2,12 +2,47 @@ import React from "react";
 import EventIcon from "@mui/icons-material/Event";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
-import { Box, Button, CardActions, Skeleton, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import { EventCard, EventContent, EventImage, EventsGrid } from "./EventList.styles";
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Grid, Skeleton, Stack, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import type { Event } from "../types/event.types";
+
+const EventsGrid = styled(Grid)(() => ({
+    maxWidth: 1000,
+    marginLeft: "auto",
+    marginRight: "auto",
+}));
+
+const EventCard = styled(Card)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    overflow: "hidden",
+
+    [theme.breakpoints.up("md")]: {
+        flexDirection: "row",
+    },
+}));
+
+const EventImage = styled(CardMedia)(({ theme }) => ({
+    width: "100%",
+    height: 200,
+    objectFit: "cover",
+
+    [theme.breakpoints.up("md")]: {
+        width: 300,
+        height: "auto",
+    },
+}));
+
+const EventContent = styled(CardContent)(({ theme }) => ({
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: theme.spacing(3),
+}));
 import { AbstractEventBackground } from "./AbstractEventBackground";
-import EventCategoryChips from "./EventCategoryChips";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 type EventListProps = {
   events: Event[];
@@ -17,47 +52,6 @@ type EventListProps = {
 };
 
 const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) => {
-  const parseEventDate = (dateString: string): Date | null => {
-    if (!dateString) return null;
-
-    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-    if (dateOnlyMatch) {
-      const [, y, m, d] = dateOnlyMatch;
-      return new Date(Number(y), Number(m) - 1, Number(d));
-    }
-
-    const parsed = new Date(dateString);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  };
-
-  //Helper to convert the date to Month DD, YYYY
-  const formatDate = (dateString: string) => {
-    const date = parseEventDate(dateString);
-    if (!date) return "";
-
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "2-digit",
-    }).format(date);
-  };
-
-  //Helper to format time
-  const formatTime = (timeString: string) => {
-    if (!timeString) return "";
-
-    // Ticketmaster localTime comes in "HH:mm:ss" format.
-    // We attach a dummy date to create a valid Date object.
-    const date = new Date(`1970-01-01T${timeString}`);
-
-    if (isNaN(date.getTime())) return "";
-
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  };
 
   return (
     <>
@@ -152,8 +146,6 @@ const EventList = ({ events, isLoading, error, onClearSearch }: EventListProps) 
                   <Typography gutterBottom variant="h5" component="div">
                     {event.title}
                   </Typography>
-
-                  <EventCategoryChips categories={event.categories} maxVisible={2} stackSx={{ mb: 1 }} />
 
                   <Stack spacing={0.5} sx={{ mt: 1 }}>
                     <Stack direction="row" spacing={1} alignItems="center">
