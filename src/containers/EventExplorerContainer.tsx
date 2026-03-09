@@ -1,13 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useEvents } from "../hooks/useEvents";
 import { useUserLocation } from "../hooks/useUserLocation";
 import EventList from "../components/EventList";
 import Hero from "../components/Hero";
 import TrendingMasonry from "../components/TrendingMasonry";
 import ErrorState from "../components/ErrorState";
-import StickyNavigation from "../components/StickyNavigation";
-import { Container, Box } from "@mui/material";
-import { PageContentWrapper } from "./EventExplorer.styles";
+import StickyNavTop from "../components/navigation/StickyNavTop";
+import StickyNavBottom from "../components/navigation/StickyNavBottom";
+import { Container, Box, styled } from "@mui/material";
+import { getRenderableCategories } from "../utils/eventCategories";
+
+const PageContentWrapper = styled(Box)(({ theme }) => ({
+    maxWidth: 1400,
+    margin: "0 auto",
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+
+    [theme.breakpoints.up("md")]: {
+        paddingLeft: theme.spacing(4),
+        paddingRight: theme.spacing(4),
+    },
+}));
 
 const EventExplorerContainer = () => {
     // Initialize query state from URL query param (if present)
@@ -15,6 +28,27 @@ const EventExplorerContainer = () => {
         const params = new URLSearchParams(window.location.search);
         return params.get("q") ?? "";
     };
+
+    // State: stores the current search query from the input
+    const [query, setQuery] = useState<string>(getInitialQueryFromURL());
+
+    // State: controls selected sorting option for events
+    // Default is date ascending
+    const [sort, setSort] = useState<string>("date,asc");
+
+    //State: stores the page number
+    const [page, setPage] = useState(0);
+
+    // State: selected category chip for filtering
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+    // Resolve user location (IP → browser → default fallback)
+    const { coords, city, isResolving } = useUserLocation();
+
+    // debouncedQuery updates only after the user stops typing.
+    // This prevents triggering API calls on every keystroke.
+    const [debouncedQuery, setDebouncedQuery] = useState<string>(query);
+
     //Handles clear search
     const handleClearSearch = () => {
         // Clear query state
@@ -27,28 +61,12 @@ const EventExplorerContainer = () => {
         // Scroll to top for better UX
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
-    // State: stores the current search query from the input
-    const [query, setQuery] = useState<string>(getInitialQueryFromURL());
-
-    // State: controls selected sorting option for events
-    // Default is date ascending
-    const [sort, setSort] = useState<string>("date,asc");
 
     // Handles sort changes and resets pagination
     const handleSortChange = (newSort: string) => {
         setPage(0);
         setSort(newSort);
     };
-
-    //State: stores the page number
-    const [page, setPage] = useState(0);
-
-    // Resolve user location (IP → browser → default fallback)
-    const { coords, city, isResolving } = useUserLocation();
-
-    // debouncedQuery updates only after the user stops typing.
-    // This prevents triggering API calls on every keystroke.
-    const [debouncedQuery, setDebouncedQuery] = useState<string>(query);
 
     //set the custom hook (useEvents)logic:
     const effectiveQuery = debouncedQuery.trim().length > 0 ? debouncedQuery : city;
@@ -100,17 +118,36 @@ const EventExplorerContainer = () => {
         setQuery(newQueryValue);
     };
 
+    // Derive unique categories from all fetched events for the chips bar
+    const uniqueCategories = useMemo(() => {
+        const cats = events.flatMap((e) => getRenderableCategories(e.categories));
+        return [...new Set(cats)];
+    }, [events]);
+
+    // Auto-reset selected category if it's no longer present in the new results
+    const activeCategory = uniqueCategories.includes(selectedCategory ?? "") ? selectedCategory : null;
+
+    // Apply category filter client-side on top of API results
+    const filteredEvents = useMemo(() => {
+        if (!activeCategory) return events;
+        return events.filter((e) =>
+            e.categories.some(
+                (c) => c.toLowerCase() === activeCategory.toLowerCase()
+            )
+        );
+    }, [events, activeCategory]);
+
     // Filter events to show only those within the next month
     const getEventsForNextMonth = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const oneMonthFromNow = new Date(today);
         oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-        
-        return events.filter(event => {
+
+        return filteredEvents.filter(event => {
             if (!event.date) return false;
-            
+
             const eventDate = new Date(event.date);
             return eventDate >= today && eventDate <= oneMonthFromNow;
         });
@@ -118,46 +155,60 @@ const EventExplorerContainer = () => {
 
     return (
         <Box>
-            {/* Sticky Navigation Bar */}
-            <StickyNavigation
+            {/* Sticky top nav: Logo (all) + SearchControls (desktop only) */}
+            <StickyNavTop
+                query={query}
+                handleQueryChange={handleQueryChange}
+                sort={sort}
+                setSort={handleSortChange}
+                categories={uniqueCategories}
+                selectedCategory={activeCategory}
+                onCategorySelect={setSelectedCategory}
+            />
+
+            {/* Main content — bottom padding on mobile to clear fixed bottom bar */}
+            <Box sx={{ pb: { xs: "72px", md: 0 } }}>
+                {!query && !isLoading && !isResolving && filteredEvents.length > 0 && (
+                    <Hero events={filteredEvents} />
+                )}
+                {!query && !isLoading && !isResolving && filteredEvents.length > 0 && (
+                    <PageContentWrapper py={6}>
+                        <TrendingMasonry
+                            events={getEventsForNextMonth()}
+                            location={city}
+                        />
+                    </PageContentWrapper>
+                )}
+
+                {/* Events Section */}
+                {error ? (
+                    <PageContentWrapper py={6}>
+                        <ErrorState
+                            message={error}
+                            onRetry={() => refetch?.()}
+                        />
+                    </PageContentWrapper>
+                ) : (
+                    (query.trim().length > 0 || isLoading) && (
+                        <Container sx={{ py: 4 }}>
+                            <EventList
+                                events={filteredEvents}
+                                isLoading={isLoading}
+                                error={error}
+                                onClearSearch={handleClearSearch}
+                            />
+                        </Container>
+                    )
+                )}
+            </Box>
+
+            {/* Fixed bottom bar — mobile only */}
+            <StickyNavBottom
                 query={query}
                 handleQueryChange={handleQueryChange}
                 sort={sort}
                 setSort={handleSortChange}
             />
-
-            {!query && !isLoading && !isResolving && events.length > 0 && (
-                <Hero events={events} />
-            )}
-            {!query && !isLoading && !isResolving && events.length > 0 && (
-                <PageContentWrapper py={6}>
-                    <TrendingMasonry 
-                        events={getEventsForNextMonth()} 
-                        location={city}
-                    />
-                </PageContentWrapper>
-            )}
-
-            {/* Events Section */}
-            {error ? (
-                <PageContentWrapper py={6}>
-                    <ErrorState
-                        message={error}
-                        onRetry={() => refetch?.()}
-                    />
-                </PageContentWrapper>
-            ) : (
-                (query.trim().length > 0 || isLoading) && (
-                    <Container sx={{ py: 4 }}>
-                        <EventList
-                            events={events}
-                            isLoading={isLoading}
-                            error={error}
-                            onClearSearch={handleClearSearch}
-                        />
-                    </Container>
-                )
-            )}
         </Box>
     );
 };

@@ -2,7 +2,7 @@ import { Box, Typography, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EventIcon from "@mui/icons-material/Event";
 import type { Event } from "../types/event.types";
-import EventCategoryChips from "./EventCategoryChips";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 interface TrendingMasonryProps {
   events: Event[];
@@ -11,19 +11,6 @@ interface TrendingMasonryProps {
 
 export default function TrendingMasonry({ events, location }: TrendingMasonryProps) {
   if (!events || events.length === 0) return null;
-
-  const parseEventDate = (dateString: string): Date | null => {
-    if (!dateString) return null;
-
-    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-    if (dateOnlyMatch) {
-      const [, y, m, d] = dateOnlyMatch;
-      return new Date(Number(y), Number(m) - 1, Number(d));
-    }
-
-    const parsed = new Date(dateString);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  };
 
   return (
     <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
@@ -47,14 +34,7 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
       >
         {events.map((event, index) => {
           const rowSpan = index % 5 === 0 ? 3 : index % 3 === 0 ? 2 : 1;
-          const parsedDate = parseEventDate(event.date);
-          const formattedDate = parsedDate
-            ? parsedDate.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            : "";
+          const formattedDate = formatDate(event.date);
 
           return (
             <Box
@@ -127,12 +107,6 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
                   color: "#fff",
                 }}
               >
-                <EventCategoryChips
-                  categories={event.categories}
-                  maxVisible={1}
-                  stackSx={{ mb: 1 }}
-                />
-
                 <Typography
                   variant="h6"
                   fontWeight={700}
@@ -159,12 +133,7 @@ export default function TrendingMasonry({ events, location }: TrendingMasonryPro
                     }}
                   >
                     {formattedDate}
-                    {event.time
-                      ? ` • ${new Date(`1970-01-01T${event.time}`).toLocaleTimeString(
-                        "en-US",
-                        { hour: "numeric", minute: "2-digit" }
-                      )}`
-                      : ""}
+                    {event.time ? ` • ${formatTime(event.time)}` : ""}
                   </Typography>
                 </Stack>
 

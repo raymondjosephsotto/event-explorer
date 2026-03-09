@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEvents } from './useEvents';
+import { useEvents } from '../hooks/useEvents';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({

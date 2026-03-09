@@ -7,48 +7,13 @@ import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 type HeroProps = {
   events: Event[];
 };
 
 const Hero = ({ events }: HeroProps) => {
-  const parseEventDate = (dateString: string): Date | null => {
-    if (!dateString) return null;
-
-    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-    if (dateOnlyMatch) {
-      const [, y, m, d] = dateOnlyMatch;
-      return new Date(Number(y), Number(m) - 1, Number(d));
-    }
-
-    const parsed = new Date(dateString);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  };
-
-  // Helper: Format date like "October 20, 2025"
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = parseEventDate(dateString);
-    if (!date) return "";
-    return new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
-  };
-
-  // Helper: Format time like "7:30 PM"
-  const formatTime = (timeString: string) => {
-    if (!timeString) return "";
-    const date = new Date(`1970-01-01T${timeString}`);
-    if (isNaN(date.getTime())) return "";
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  };
   // Return empty fragment if no events are available
   if (!events || events.length === 0) {
     return <></>;
@@ -65,9 +30,9 @@ const Hero = ({ events }: HeroProps) => {
           height: 8,
           transition: "all 300ms ease",
         },
-        // Active bullet expands horizontally and becomes fully opaque
+        // Active bullet expands horizontally and uses brand orange
         "& .swiper-pagination-bullet-active": {
-          backgroundColor: "#fff",
+          backgroundColor: "#F97316",
           width: 22,
           borderRadius: 4,
         },

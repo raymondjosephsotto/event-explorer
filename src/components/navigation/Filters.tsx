@@ -24,6 +24,7 @@ const Filters = ({ query, handleQueryChange }: FiltersProps) => {
       value={query}
       // TS: Updates query state when the input value changes
       onChange={handleQueryChange}
+      size="small"
       fullWidth
       slotProps={{
         input: {
