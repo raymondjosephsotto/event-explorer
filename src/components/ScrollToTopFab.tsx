@@ -5,13 +5,15 @@ import { useScrolledDown } from "../hooks/useScrolledDown";
 
 const FabContainer = styled(Box)(({ theme }) => ({
     position: "fixed",
-    bottom: theme.spacing(4),
-    right: theme.spacing(4),
+    right: theme.spacing(2),
     zIndex: 1000,
 
-    display: "none",
+    // Mobile: float above the browser's bottom chrome
+    bottom: `calc(env(safe-area-inset-bottom) + ${theme.spacing(10)})`,
+
     [theme.breakpoints.up("md")]: {
-        display: "block",
+        bottom: theme.spacing(4),
+        right: theme.spacing(4),
     },
 }));
 

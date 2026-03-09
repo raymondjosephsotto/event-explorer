@@ -2,9 +2,7 @@ import { useState } from "react";
 import { FormControl, InputLabel, MenuItem, Select, Stack, Box, IconButton, Menu, Tooltip } from "@mui/material";
 import SortRoundedIcon from "@mui/icons-material/SortRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
-import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import Filters from "./Filters";
-import { useScrolledDown } from "../../hooks/useScrolledDown";
 
 const SORT_OPTIONS = [
     { value: "date,asc", label: "Date Ascending" },
@@ -21,7 +19,6 @@ interface SearchControlsProps {
 
 const SearchControls = ({ query, handleQueryChange, sort, setSort }: SearchControlsProps) => {
     const showSort = query.trim().length > 0;
-    const scrolledDown = useScrolledDown();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     return (
@@ -69,28 +66,6 @@ const SearchControls = ({ query, handleQueryChange, sort, setSort }: SearchContr
                         </MenuItem>
                     ))}
                 </Menu>
-            </Box>
-
-            {/* Mobile: scroll-to-top button */}
-            <Box sx={{
-                display: { xs: "flex", md: "none" },
-                flexShrink: 0,
-                width: scrolledDown ? "40px" : 0,
-                marginLeft: scrolledDown ? (showSort ? "4px" : "12px") : 0,
-                opacity: scrolledDown ? 1 : 0,
-                overflow: "hidden",
-                pointerEvents: scrolledDown ? "auto" : "none",
-                transition: "width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease",
-            }}>
-                <Tooltip title="Scroll to top">
-                    <IconButton
-                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                        size="small"
-                        aria-label="scroll to top"
-                    >
-                        <KeyboardArrowUpRoundedIcon />
-                    </IconButton>
-                </Tooltip>
             </Box>
 
             {/* Desktop: Select dropdown */}
