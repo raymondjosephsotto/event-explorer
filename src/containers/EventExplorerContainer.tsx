@@ -6,7 +6,6 @@ import Hero from "../components/Hero";
 import TrendingMasonry from "../components/TrendingMasonry";
 import ErrorState from "../components/ErrorState";
 import StickyNavTop from "../components/navigation/StickyNavTop";
-import StickyNavBottom from "../components/navigation/StickyNavBottom";
 import ScrollToTopFab from "../components/ScrollToTopFab";
 import { Container, Box, styled } from "@mui/material";
 import { getRenderableCategories } from "../utils/eventCategories";
@@ -167,8 +166,8 @@ const EventExplorerContainer = () => {
                 onCategorySelect={setSelectedCategory}
             />
 
-            {/* Main content — bottom padding on mobile to clear fixed bottom bar */}
-            <Box sx={{ pb: { xs: "72px", md: 0 } }}>
+            {/* Main content */}
+            <Box>
                 {!query && !isLoading && !isResolving && filteredEvents.length > 0 && (
                     <Hero events={filteredEvents} />
                 )}
@@ -202,14 +201,6 @@ const EventExplorerContainer = () => {
                     )
                 )}
             </Box>
-
-            {/* Fixed bottom bar — mobile only */}
-            <StickyNavBottom
-                query={query}
-                handleQueryChange={handleQueryChange}
-                sort={sort}
-                setSort={handleSortChange}
-            />
 
             <ScrollToTopFab />
         </Box>

@@ -27,11 +27,11 @@ interface StickyNavTopProps {
 const StickyNavTop = ({ query, handleQueryChange, sort, setSort, categories, selectedCategory, onCategorySelect }: StickyNavTopProps) => {
     return (
         <StickyTopBar>
-            <Container sx={{ py: 1.5 }}>
+            <Container sx={{ pt: { xs: 2, md: 1.5 }, pb: 1.5 }}>
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={{ xs: 0, md: 3 }}
-                    alignItems={{ md: "center" }}
+                    direction="row"
+                    spacing={{ xs: 1.5, md: 3 }}
+                    alignItems="center"
                 >
                     {/* Logo */}
                     <Link
@@ -40,8 +40,7 @@ const StickyNavTop = ({ query, handleQueryChange, sort, setSort, categories, sel
                         color="inherit"
                         sx={{
                             display: "flex",
-                            justifyContent: { xs: "center", md: "flex-start" },
-                            width: { xs: "100%", md: "auto" },
+                            flexShrink: 0,
                             "&:hover": { opacity: 0.8 },
                             transition: "opacity 0.2s ease",
                         }}
@@ -51,7 +50,7 @@ const StickyNavTop = ({ query, handleQueryChange, sort, setSort, categories, sel
                                 component="img"
                                 src={logo}
                                 alt="Event Explorer Logo"
-                                sx={{ height: { xs: 35, md: 50 } }}
+                                sx={{ height: { xs: 32, md: 50 } }}
                             />
                             <Typography
                                 variant="h6"
@@ -62,6 +61,7 @@ const StickyNavTop = ({ query, handleQueryChange, sort, setSort, categories, sel
                                     textDecoration: "none",
                                     letterSpacing: "-0.02em",
                                     fontSize: { xs: 18, md: 20 },
+                                    display: { xs: "none", md: "block" },
                                 }}
                             >
                                 Event Explorer
@@ -69,8 +69,8 @@ const StickyNavTop = ({ query, handleQueryChange, sort, setSort, categories, sel
                         </Stack>
                     </Link>
 
-                    {/* SearchControls — desktop only */}
-                    <Box sx={{ display: { xs: "none", md: "flex" }, flex: 1 }}>
+                    {/* SearchControls — mobile and desktop */}
+                    <Box sx={{ flex: 1 }}>
                         <SearchControls
                             query={query}
                             handleQueryChange={handleQueryChange}
