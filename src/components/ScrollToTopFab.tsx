@@ -9,7 +9,7 @@ const FabContainer = styled(Box)(({ theme }) => ({
     zIndex: 1000,
 
     // Mobile: float above the browser's bottom chrome
-    bottom: `calc(env(safe-area-inset-bottom) + ${theme.spacing(10)})`,
+    bottom: `calc(env(safe-area-inset-bottom) + 50px)`,
 
     [theme.breakpoints.up("md")]: {
         bottom: theme.spacing(4),
