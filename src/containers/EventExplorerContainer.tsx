@@ -7,6 +7,7 @@ import TrendingMasonry from "../components/TrendingMasonry";
 import ErrorState from "../components/ErrorState";
 import StickyNavTop from "../components/navigation/StickyNavTop";
 import StickyNavBottom from "../components/navigation/StickyNavBottom";
+import ScrollToTopFab from "../components/ScrollToTopFab";
 import { Container, Box, styled } from "@mui/material";
 import { getRenderableCategories } from "../utils/eventCategories";
 
@@ -209,6 +210,8 @@ const EventExplorerContainer = () => {
                 sort={sort}
                 setSort={handleSortChange}
             />
+
+            <ScrollToTopFab />
         </Box>
     );
 };
