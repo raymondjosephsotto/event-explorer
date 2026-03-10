@@ -2,9 +2,9 @@ import { createTheme } from "@mui/material";
 
 // ── Brand Tokens ──
 const brand = {
-  orange:    "#F97316",  // Classic Orange — primary accent
-  orangeDark:"#EA580C",  // Pressed / hover state
-  orangeLight:"#FB923C", // Lighter tint for highlights
+  orange:    "#6366F1",  // Indigo — primary accent
+  orangeDark:"#4F46E5",  // Pressed / hover state
+  orangeLight:"#818CF8", // Lighter tint for highlights
 
   bgDefault: "#0D1117",  // Deep black background
   bgSurface: "#161B22",  // Surface / panel
@@ -59,7 +59,7 @@ const darkTheme = createTheme({
           boxShadow: "none",
           "&:hover": {
             backgroundColor: brand.orangeDark,
-            boxShadow: "0 2px 8px rgba(249,115,22,0.3)",
+            boxShadow: "0 2px 8px rgba(99,102,241,0.3)",
           },
         },
         outlined: {
@@ -67,7 +67,7 @@ const darkTheme = createTheme({
           color: brand.textPrimary,
           "&:hover": {
             borderColor: brand.orange,
-            backgroundColor: "rgba(249,115,22,0.08)",
+            backgroundColor: "rgba(99,102,241,0.08)",
           },
         },
       },

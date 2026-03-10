@@ -32,7 +32,7 @@ const Hero = ({ events }: HeroProps) => {
         },
         // Active bullet expands horizontally and uses brand orange
         "& .swiper-pagination-bullet-active": {
-          backgroundColor: "#F97316",
+          backgroundColor: "#6366F1",
           width: 22,
           borderRadius: 4,
         },
